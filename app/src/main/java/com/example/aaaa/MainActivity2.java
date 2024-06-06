@@ -1,5 +1,6 @@
 package com.example.aaaa;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -7,42 +8,33 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+
+import com.example.aaaa.localdatabase.AsiaDateTimeHelper;
+import com.example.aaaa.localdatabase.HomeActivity;
+import com.example.aaaa.localdatabase.ProfileUpgradeManager;
+import com.example.aaaa.localdatabase.SharedPreferencesManager;
+import com.example.aaaa.localdatabase.WorkManager;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.util.Log;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.mlkit.vision.common.InputImage;
-
-import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer;
-import org.tensorflow.lite.support.image.TensorImage;
 
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.Arrays;
+import java.util.function.Consumer;
 
 
 public class MainActivity2 extends AppCompatActivity {
@@ -52,7 +44,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     private static final String TAG = "TextExtractorActivity";
     private ImageView imageView;
-    private TextView textView;
+    private TextView textView,resulttext;
 
 
     private static final int INPUT_SIZE = 224; // Assuming your model expects a 224x224 input image
@@ -86,6 +78,7 @@ public class MainActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
+        resulttext=findViewById(R.id.resulttext);
         //
         try {
             loadModel();
@@ -175,80 +168,147 @@ public class MainActivity2 extends AppCompatActivity {
         return segments;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void changee(View view) {
+       /*
         // Create an InputImage object from a Bitmap
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ccf);
         InputImage image = InputImage.fromBitmap(bitmap, 0);
-
+        changeimage.setImageBitmap(bitmap);
         OCRManager ocrManager = new OCRManager();
         ocrManager.performOCR(image, new OCRManager.OCRCallback() {
             @Override
             public void onOCRComplete(List<String> detectedTextList) {
                 // Process the detectedTextList here
-
-                for (int i = 0; i < detectedTextList.size(); i++) {
-                    String text = detectedTextList.get(i);
-                    String cleanedText = text.replaceAll("[^a-zA-Z0-9\\s+]", "");
-                    detectedTextList.set(i, cleanedText);
-                }
-                //replaced space
-                for (int i = 0; i < detectedTextList.size(); i++) {
-                    String text = detectedTextList.get(i);
-                    String cleanedText = text.replaceAll(" ", "");
-                    detectedTextList.set(i, cleanedText);
-                }
-
-
-                for (int i = 0; i < detectedTextList.size(); i++) {
-                    String text = detectedTextList.get(i);
-                    int length = text.length();
-                    int kk = length % 6;
-                    if (!text.isEmpty()) {
-                       String modifiedText = text.substring(kk);
-                        detectedTextList.set(i, modifiedText);
-                    }
-                }
-                Collections.sort(detectedTextList, new Comparator<String>() {
-                    @Override
-                    public int compare(String s1, String s2) {
-                        String s1Prefix = s1.length() >= 2 ? s1.substring(0, 2) : s1;
-                        String s2Prefix = s2.length() >= 2 ? s2.substring(0, 2) : s2;
-                        return s1Prefix.compareTo(s2Prefix);
-                    }
+                detectedTextList=filterdatalist(detectedTextList);
+                detectedTextList = cleanTextList(detectedTextList);
+                detectedTextList= removeWhitespaceFromList(detectedTextList);
+                detectedTextList = modifyTextList(detectedTextList);
+                detectedTextList = sortTextListByPrefix(detectedTextList);
+                detectedTextList = processTextList(detectedTextList);
+                determinePercentage(detectedTextList, resultList -> {
+                    System.out.println("Resulting List:"+resultList);
+                    System.out.println("Resulting List:"+resultList.size());
                 });
-                //
-                //substring
-
-
-                List<String> updatedTextList = new ArrayList<>();
-                for (String text : detectedTextList) {
-                    int length = text.length();
-                    for (int j = 0; j < length; j += 6) {
-                        int endIndex = Math.min(j + 6, length);
-                        String substring = text.substring(j, endIndex);
-                        if (substring.length() >= 6) {
-                            StringBuilder sb = new StringBuilder(substring);
-                            sb.insert(4, ":");
-                            updatedTextList.add(sb.toString());
-                        } else {
-                            updatedTextList.add(substring);
-                        }
-                    }
-                }
-                detectedTextList.clear();
-                detectedTextList.addAll(updatedTextList);
-
                 //now add :
-
-                Log.d("KKKKKKKKKKKK", ""+detectedTextList);
+                resulttext.setText("");
+                resulttext.setText(""+detectedTextList);
+                Log.d("KKKKKKKKKKKK", ""+detectedTextList.size());
             }
         });
 
 
+        */
 
+
+    }
+    public static List<String> filterdatalist(List<String> textList) {
+        List<String> updatedTextList = new ArrayList<>();
+
+        for (String text : textList) {
+            int length = text.length();
+            if (length >=6)
+            {
+                updatedTextList.add(text);
+            }
+        }
+        return updatedTextList;
+    }
+    public void determinePercentage(List<String> detectedTextList, Consumer<List<String>> callback) {
+        List<String> newList = new ArrayList<>();
+        for (String text : detectedTextList) {
+            if (text.length() >= 5) {
+                long digitCount = text.chars().filter(Character::isDigit).count();
+                long specialCharacterCount = text.chars().filter(c -> !Character.isLetterOrDigit(c) && !Character.isWhitespace(c)).count();
+                if (digitCount >= 6) {
+                    int digitScore = 4 * 20;
+                    int specialCharacterScore = specialCharacterCount > 1 ? (int) (specialCharacterCount * 10) : 20;
+                    int total = digitScore + specialCharacterScore;
+                    String digitScoreString = total + "%";
+                    newList.add(digitScoreString);
+                } else {
+                    int digitScore = (int) (digitCount * 15);
+                    int specialCharacterScore = specialCharacterCount > 1 ? (int) (specialCharacterCount * 5) : 5;
+                    int total = digitScore + specialCharacterScore;
+                    String digitScoreString = total + "%";
+                    newList.add(digitScoreString);
+                }
+            }
+        }
+        callback.accept(newList);
+    }
+    public static List<String> processTextList(List<String> textList) {
+        List<String> updatedTextList = new ArrayList<>();
+
+        for (String text : textList) {
+            int length = text.length();
+            for (int j = 0; j < length; j += 6) {
+                int endIndex = Math.min(j + 6, length);
+                String substring = text.substring(j, endIndex);
+                if (substring.length() >= 6) {
+                    StringBuilder sb = new StringBuilder(substring);
+                    sb.insert(4, ":");
+                    updatedTextList.add(sb.toString());
+                } else {
+                    updatedTextList.add(substring);
+                }
+            }
+        }
+
+        return updatedTextList;
+    }
+    public static List<String> sortTextListByPrefix(List<String> textList) {
+        List<String> sortedTextList = new ArrayList<>(textList);
+
+        Collections.sort(sortedTextList, new Comparator<String>() {
+            @Override
+            public int compare(String s1, String s2) {
+                String s1Prefix = s1.length() >= 2 ? s1.substring(0, 2) : s1;
+                String s2Prefix = s2.length() >= 2 ? s2.substring(0, 2) : s2;
+                return s1Prefix.compareTo(s2Prefix);
+            }
+        });
+
+        return sortedTextList;
+    }
+    public static List<String> modifyTextList(List<String> textList) {
+        List<String> modifiedTextList = new ArrayList<>();
+
+        for (String text : textList) {
+            if (!text.isEmpty()) {
+                int length = text.length();
+                int kk = length % 6;
+                String modifiedText = text.substring(kk);
+                modifiedTextList.add(modifiedText);
+            } else {
+                modifiedTextList.add("");
+            }
+        }
+
+        return modifiedTextList;
+    }
+    public static List<String> removeWhitespaceFromList(List<String> textList) {
+        List<String> cleanedTextList = new ArrayList<>();
+
+        for (String text : textList) {
+            String cleanedText = text.replaceAll("\\s+", "");
+            cleanedTextList.add(cleanedText);
+        }
+
+        return cleanedTextList;
     }
     public static String getText(Context context, Bitmap bitmap) {
 String getTxt = "0";
 return  getTxt;
+    }
+    public static List<String> cleanTextList(List<String> textList) {
+        List<String> cleanedTextList = new ArrayList<>();
+
+        for (String text : textList) {
+            String cleanedText = text.replaceAll("[^a-zA-Z0-9\\s+]", "");
+            cleanedTextList.add(cleanedText);
+        }
+
+        return cleanedTextList;
     }
 }

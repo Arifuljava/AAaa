@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import com.example.aaaa.localdatabase.AsiaDateTimeHelper;
 import com.example.aaaa.localdatabase.HomeActivity;
 import com.example.aaaa.localdatabase.ProfileUpgradeManager;
+import com.example.aaaa.localdatabase.RegistrationAcivity;
 import com.example.aaaa.localdatabase.SharedPreferencesManager;
 import com.example.aaaa.localdatabase.WorkManager;
 
@@ -199,8 +201,6 @@ public class MainActivity2 extends AppCompatActivity {
 
 
         */
-
-
     }
     public static List<String> filterdatalist(List<String> textList) {
         List<String> updatedTextList = new ArrayList<>();

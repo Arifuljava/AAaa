@@ -31,7 +31,7 @@ public class TextRecognitionManager {
                         String resultText = visionText.getText();
                         resultText =  resultText
                                 .replace("L", "1")
-                                .replace("l", "1")
+                                .replace("l", "|")
                                 .replace("s", "5")
                                 .replace("S", "5")
                                 .replace("a", "8")

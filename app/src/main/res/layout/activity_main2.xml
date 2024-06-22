@@ -67,6 +67,22 @@
                 android:id="@+id/resulttext"
                 ></TextView>
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+         <androidx.recyclerview.widget.RecyclerView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginRight="20dp"
+             android:layout_marginLeft="20dp"
+             android:layout_marginTop="10dp"
+             android:id="@+id/listview"
+             >
+
+         </androidx.recyclerview.widget.RecyclerView>
+        </RelativeLayout>
     </LinearLayout>
 
 </LinearLayout>

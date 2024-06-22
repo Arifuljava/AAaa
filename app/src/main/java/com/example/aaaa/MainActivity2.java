@@ -1,7 +1,10 @@
 package com.example.aaaa;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,22 +15,31 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.example.aaaa.localdatabase.AsiaDateTimeHelper;
 import com.example.aaaa.localdatabase.HomeActivity;
+import com.example.aaaa.localdatabase.ItemAdapter;
+import com.example.aaaa.localdatabase.LoginActivityManager;
 import com.example.aaaa.localdatabase.ProfileUpgradeManager;
 import com.example.aaaa.localdatabase.RegistrationAcivity;
 import com.example.aaaa.localdatabase.SharedPreferencesManager;
+import com.example.aaaa.localdatabase.UserModel;
 import com.example.aaaa.localdatabase.WorkManager;
+import com.google.mlkit.vision.common.InputImage;
+import com.googlecode.tesseract.android.TessBaseAPI;
 
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +48,7 @@ import org.tensorflow.lite.Interpreter;
 
 import java.io.FileInputStream;
 import java.nio.channels.FileChannel;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 
@@ -54,6 +67,7 @@ public class MainActivity2 extends AppCompatActivity {
 
     private Interpreter interpreter;
     private List<String> detectedTextList = new ArrayList<>();
+    RecyclerView listview;
     private void loadModel() throws IOException {
         MappedByteBuffer modelFile = loadModelFile();
         Interpreter.Options options = new Interpreter.Options();
@@ -75,12 +89,20 @@ public class MainActivity2 extends AppCompatActivity {
 
         return resizedBitmap;
     }
+    private ItemAdapter itemAdapter;
+    private List<UserModel> itemList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         resulttext=findViewById(R.id.resulttext);
+        listview=findViewById(R.id.listview);
+        //
+        listview.setLayoutManager(new LinearLayoutManager(this));
+        itemList = new ArrayList<>();
+        itemAdapter = new ItemAdapter(itemList);
+        listview.setAdapter(itemAdapter);
         //
         try {
             loadModel();
@@ -132,7 +154,8 @@ public class MainActivity2 extends AppCompatActivity {
         }
         return binaryImage;
     }
-    private List<Bitmap> segmentImage(Bitmap binaryImage) {
+    @NonNull
+    private List<Bitmap> segmentImage(@NonNull Bitmap binaryImage) {
         int width = binaryImage.getWidth();
         int height = binaryImage.getHeight();
         List<Integer> columnSums = new ArrayList<>();
@@ -172,9 +195,10 @@ public class MainActivity2 extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void changee(View view) {
-       /*
+
         // Create an InputImage object from a Bitmap
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.ccf);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image_29);
+        /*
         InputImage image = InputImage.fromBitmap(bitmap, 0);
         changeimage.setImageBitmap(bitmap);
         OCRManager ocrManager = new OCRManager();
@@ -198,9 +222,90 @@ public class MainActivity2 extends AppCompatActivity {
                 Log.d("KKKKKKKKKKKK", ""+detectedTextList.size());
             }
         });
+         */
 
 
+        //addItemToSharedPreferencesList("ArifulIslam");
+
+       /*
+        List<String> sampleList = Arrays.asList("item1", "item2", "item3");
+        SharedPreferencesManager.saveListToSharedPreferences(MainActivity2.this, "MyPrefs", sampleList, "myListKey");
+        String retrievedText = SharedPreferencesManager.retrieveTextFromSharedPreferences(MainActivity2.this, "MyPrefs", "myListKey");
+        if (retrievedText != null) {
+            // Do something with the retrieved text
+            System.out.println("Retrieved Text: " + retrievedText);
+        } else {
+            System.out.println("No text found for the given key.");
+        }
         */
+
+
+
+
+         TextRecognitionManager textRecognitionManager;
+        textRecognitionManager = new TextRecognitionManager();
+
+
+        textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
+            @Override
+            public void onSuccess(String resultText) {
+                // Use the extracted text as needed
+                Log.d("Extracted Text", resultText);
+                Log.d("Extracted Text", ""+resultText.length());
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                // Handle error
+                Log.e("Text Recognition Error", errorMessage);
+            }
+        });
+
+UserModel userModel=new UserModel("name", "email", "phonenumber"
+        ,"uuid", "time", "username","password",
+        "whatsappnumber", "depositbalance",
+        "currentbalance22", "lastclick", "refername",
+        "withdrawtotal", "sendmoneytotal") ;
+     //  String uiui = UUID.randomUUID().toString();
+        //addItemToSharedPreferencesList(userModel);
+        displayFullList22();
+
+
+    }
+
+    private void displayFullList22() {
+        List<UserModel> fullList = SharedPreferencesManager.retrieveListFromSharedPreferences(this, PREFS_NAME, LIST_KEY, UserModel.class);
+        if (fullList != null) {
+            itemAdapter.setItemList(fullList);} else {
+            itemAdapter.setItemList(new ArrayList<UserModel>());}
+        Log.e("HJHHJH",""+fullList);
+    }
+    private void displayFullList() {
+
+        List<UserModel> fullList = SharedPreferencesManager.retrieveListFromSharedPreferences(this, PREFS_NAME, LIST_KEY, UserModel.class);
+        if (fullList != null && !fullList.isEmpty()) {
+            StringBuilder listDisplay = new StringBuilder();
+            for (UserModel item : fullList) {
+                listDisplay.append(item).append("\n");
+            }
+            resulttext.setText(listDisplay.toString());
+        } else {
+            resulttext.setText("No items found.");
+        }
+    }
+    private static final String PREFS_NAME = "MyPrefs";
+    private static final String LIST_KEY = "myListKey1";
+    private void addItemToSharedPreferencesList(UserModel newItem) {
+
+        List<UserModel> currentList = SharedPreferencesManager.retrieveListFromSharedPreferences(this, PREFS_NAME, LIST_KEY, UserModel.class);
+        if (currentList == null) {
+            currentList = new ArrayList<>();
+        }
+        // Add the new item to the list
+        currentList.add(newItem);
+        // Save the updated list back to SharedPreferences
+        SharedPreferencesManager.saveListToSharedPreferences(this, PREFS_NAME, currentList, LIST_KEY);
+        Toast.makeText(this, "Item added: " + newItem, Toast.LENGTH_SHORT).show();
     }
     public static List<String> filterdatalist(List<String> textList) {
         List<String> updatedTextList = new ArrayList<>();

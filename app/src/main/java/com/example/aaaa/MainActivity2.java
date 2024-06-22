@@ -197,7 +197,7 @@ public class MainActivity2 extends AppCompatActivity {
     public void changee(View view) {
 
         // Create an InputImage object from a Bitmap
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image_29);
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image_27);
         /*
         InputImage image = InputImage.fromBitmap(bitmap, 0);
         changeimage.setImageBitmap(bitmap);
@@ -251,7 +251,12 @@ public class MainActivity2 extends AppCompatActivity {
             public void onSuccess(String resultText) {
                 // Use the extracted text as needed
                 Log.d("Extracted Text", resultText);
-                Log.d("Extracted Text", ""+resultText.length());
+                String[] words = resultText.split("\\s+");
+
+                // Log each word separately
+                for (String word : words) {
+                    Log.d("Word", word);
+                }
             }
 
             @Override

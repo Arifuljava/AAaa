@@ -41,7 +41,14 @@ public class TextRecognitionManager {
                                 .replace("B","3")
                                 .replace("b","2")
                                 .replace("Þ","2")
-                                .replace("$","3");
+                                .replace("P","9")
+                                .replace("D","0")
+                                .replace("$","3")
+                                .replace(".",":")
+                                .replace("\"", ":")
+                                .replace("(","|")
+                                .replace(")","|")
+                                ;
                         callback.onSuccess(resultText);
                     }
                 })

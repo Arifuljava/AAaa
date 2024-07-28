@@ -3,15 +3,24 @@ package com.example.aaaa;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -50,16 +59,18 @@ import java.io.FileInputStream;
 import java.nio.channels.FileChannel;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class MainActivity2 extends AppCompatActivity {
-    ImageView realimage,changeimage;
-    private  int current_index = 0 ;
+    ImageView realimage, changeimage;
+    private int current_index = 0;
     private List<Bitmap> segments;
 
     private static final String TAG = "TextExtractorActivity";
     private ImageView imageView;
-    private TextView textView,resulttext;
+    private TextView textView, resulttext;
 
 
     private static final int INPUT_SIZE = 224; // Assuming your model expects a 224x224 input image
@@ -68,11 +79,13 @@ public class MainActivity2 extends AppCompatActivity {
     private Interpreter interpreter;
     private List<String> detectedTextList = new ArrayList<>();
     RecyclerView listview;
+
     private void loadModel() throws IOException {
         MappedByteBuffer modelFile = loadModelFile();
         Interpreter.Options options = new Interpreter.Options();
         interpreter = new Interpreter(modelFile, options);
     }
+
     private MappedByteBuffer loadModelFile() throws IOException {
         AssetFileDescriptor fileDescriptor = getAssets().openFd("model.tflite");
         FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
@@ -81,6 +94,7 @@ public class MainActivity2 extends AppCompatActivity {
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
+
     private Bitmap preprocess(Bitmap inputBitmap) {
         // Resize the image to 28x28 pixels
         int targetWidth = 28;
@@ -89,15 +103,17 @@ public class MainActivity2 extends AppCompatActivity {
 
         return resizedBitmap;
     }
+
     private ItemAdapter itemAdapter;
     private List<UserModel> itemList;
-
+    BluetoothAdapter bluetoothAdapter ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
-        resulttext=findViewById(R.id.resulttext);
-        listview=findViewById(R.id.listview);
+        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        resulttext = findViewById(R.id.resulttext);
+        listview = findViewById(R.id.listview);
         //
         listview.setLayoutManager(new LinearLayoutManager(this));
         itemList = new ArrayList<>();
@@ -117,13 +133,13 @@ public class MainActivity2 extends AppCompatActivity {
         }
         //
 
-        realimage=findViewById(R.id.realimage);
-        changeimage=findViewById(R.id.changeimage);
+        realimage = findViewById(R.id.realimage);
+        changeimage = findViewById(R.id.changeimage);
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.su);
         realimage.setImageBitmap(bitmap);
         Bitmap grayImage = preprocessImage(bitmap);
-        Bitmap binaryImage =binarizeImage(grayImage);
+        Bitmap binaryImage = binarizeImage(grayImage);
         segments = segmentImage(binaryImage);
 
     }
@@ -139,6 +155,7 @@ public class MainActivity2 extends AppCompatActivity {
         }
         return grayImage;
     }
+
     private Bitmap binarizeImage(Bitmap grayImage) {
         Bitmap binaryImage = Bitmap.createBitmap(grayImage.getWidth(), grayImage.getHeight(), Bitmap.Config.ARGB_8888);
         for (int x = 0; x < grayImage.getWidth(); x++) {
@@ -154,6 +171,7 @@ public class MainActivity2 extends AppCompatActivity {
         }
         return binaryImage;
     }
+
     @NonNull
     private List<Bitmap> segmentImage(@NonNull Bitmap binaryImage) {
         int width = binaryImage.getWidth();
@@ -193,119 +211,179 @@ public class MainActivity2 extends AppCompatActivity {
         return segments;
     }
 
+    private Bitmap adjustBrightness(Bitmap bitmap, float brightness) {
+        // Create a new bitmap with the same width and height as the original
+        Bitmap brightBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+
+        // Create a canvas to draw on the new bitmap
+        Canvas canvas = new Canvas(brightBitmap);
+
+        // Create a paint object
+        Paint paint = new Paint();
+
+        // Create a color matrix
+        ColorMatrix colorMatrix = new ColorMatrix();
+
+        // Adjust the brightness (1 means no change, >1 means brighter, <1 means darker)
+        colorMatrix.set(new float[]{
+                brightness, 0, 0, 0, 0,
+                0, brightness, 0, 0, 0,
+                0, 0, brightness, 0, 0,
+                0, 0, 0, 1, 0
+        });
+
+        // Set the color filter to the paint object
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+
+        // Draw the original bitmap onto the canvas using the paint with the brightness filter
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+
+        return brightBitmap;
+    }
+
+    private Bitmap adjustBrightnessAndRotate(Bitmap bitmap, float brightness, float degrees) {
+        // Create a new bitmap with the same width and height as the original
+        Bitmap brightBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+
+        // Create a canvas to draw on the new bitmap
+        Canvas canvas = new Canvas(brightBitmap);
+
+        // Create a paint object
+        Paint paint = new Paint();
+
+        // Create a color matrix
+        ColorMatrix colorMatrix = new ColorMatrix();
+
+        // Adjust the brightness (1 means no change, >1 means brighter, <1 means darker)
+        colorMatrix.set(new float[]{
+                brightness, 0, 0, 0, 0,
+                0, brightness, 0, 0, 0,
+                0, 0, brightness, 0, 0,
+                0, 0, 0, 1, 0
+        });
+
+        // Set the color filter to the paint object
+        paint.setColorFilter(new ColorMatrixColorFilter(colorMatrix));
+
+        // Create a matrix for rotation
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degrees, bitmap.getWidth() / 2f, bitmap.getHeight() / 2f);
+
+        // Draw the original bitmap onto the canvas using the paint with the brightness filter
+        canvas.drawBitmap(bitmap, 0, 0, paint);
+
+        // Create a new bitmap to hold the rotated result
+        Bitmap rotatedBitmap = Bitmap.createBitmap(brightBitmap, 0, 0, brightBitmap.getWidth(), brightBitmap.getHeight(), matrix, true);
+
+        return rotatedBitmap;
+    }
+
+    private RecyclerView recyclerView;
+    private TableAdapter adapter;
+    private List<RowData> rowDataList;
+
+    public String processLine(String line) {
+        String[] parts = line.split("\\|");
+        StringBuilder processedLineBuilder = new StringBuilder();
+        for (String part : parts) {
+            processedLineBuilder.append(part.trim()).append(" ");
+        }
+        String processedLine = processedLineBuilder.toString().trim();
+        StringBuilder output = new StringBuilder();
+
+        for (char c : processedLine.toCharArray()) {
+            if (Character.isDigit(c) || Character.isWhitespace(c)) {
+                output.append(c);
+            } else {
+                output.append(' ');
+            }
+        }
+        String result = output.toString();
+        return result;
+    }
+
+    private static final int REQUEST_ENABLE_BT = 1;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void changee(View view) {
 
-        // Create an InputImage object from a Bitmap
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image_26);
-        /*
-        InputImage image = InputImage.fromBitmap(bitmap, 0);
-        changeimage.setImageBitmap(bitmap);
-        OCRManager ocrManager = new OCRManager();
-        ocrManager.performOCR(image, new OCRManager.OCRCallback() {
-            @Override
-            public void onOCRComplete(List<String> detectedTextList) {
-                // Process the detectedTextList here
-                detectedTextList=filterdatalist(detectedTextList);
-                detectedTextList = cleanTextList(detectedTextList);
-                detectedTextList= removeWhitespaceFromList(detectedTextList);
-                detectedTextList = modifyTextList(detectedTextList);
-                detectedTextList = sortTextListByPrefix(detectedTextList);
-                detectedTextList = processTextList(detectedTextList);
-                determinePercentage(detectedTextList, resultList -> {
-                    System.out.println("Resulting List:"+resultList);
-                    System.out.println("Resulting List:"+resultList.size());
-                });
-                //now add :
-                resulttext.setText("");
-                resulttext.setText(""+detectedTextList);
-                Log.d("KKKKKKKKKKKK", ""+detectedTextList.size());
-            }
-        });
-         */
 
+        if (bluetoothAdapter == null) {
 
-        //addItemToSharedPreferencesList("ArifulIslam");
-
-       /*
-        List<String> sampleList = Arrays.asList("item1", "item2", "item3");
-        SharedPreferencesManager.saveListToSharedPreferences(MainActivity2.this, "MyPrefs", sampleList, "myListKey");
-        String retrievedText = SharedPreferencesManager.retrieveTextFromSharedPreferences(MainActivity2.this, "MyPrefs", "myListKey");
-        if (retrievedText != null) {
-            // Do something with the retrieved text
-            System.out.println("Retrieved Text: " + retrievedText);
-        } else {
-            System.out.println("No text found for the given key.");
+            return;
         }
-        */
 
-
-
-
-         TextRecognitionManager textRecognitionManager;
-        textRecognitionManager = new TextRecognitionManager();
-
-
-        textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
-            @Override
-            public void onSuccess(String resultText) {
-                 Log.d("Extracted Text", resultText);
-                String[] words = resultText.split("\\s+");
-                ArrayList<String> filteredWords = new ArrayList<>();
-                for (String word : words) {
-                    if (word.length() >= 6) {
-                        if (containsEnglishAlphabet(word))
-                        {
-
-                        }
-                        else {
-                            filteredWords.add(word);
-                        }
-                    }
-                }
-
-                //remove special character from first
-                removeSpecialCharacters(filteredWords);
-
-                // remove white space
-                //detectedTextList= removeWhitespaceFromList(filteredWords);
-
-                //remove special character from list
-                processStrings(filteredWords);
-
-                // Print the modified strings
-                filteredWords = splitAndProcess(filteredWords);
-
-                // Print the result
-                filteredWords = splitBy7(filteredWords);
-                filteredWords = checkspecialindexxx(filteredWords);
-                determinePercentage(filteredWords, resultList -> {
-                    System.out.println("Resulting List:"+resultList);
-                    System.out.println("Resulting List:"+resultList.size());
-                });
-                Log.d("haveeeee", ""+filteredWords);
+        // Check Bluetooth permissions
+        //checking android 12 or big
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S){
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_ENABLE_BT);
+            } else {
+                enableBluetooth(bluetoothAdapter);
             }
-
-            @Override
-            public void onError(String errorMessage) {
-                // Handle error
-                Log.e("Text Recognition Error", errorMessage);
-            }
-        });
-
-/*
-UserModel userModel=new UserModel("name", "email", "phonenumber"
-        ,"uuid", "time", "username","password",
-        "whatsappnumber", "depositbalance",
-        "currentbalance22", "lastclick", "refername",
-        "withdrawtotal", "sendmoneytotal") ;
- */
-     //  String uiui = UUID.randomUUID().toString();
-        //addItemToSharedPreferencesList(userModel);
-      //  displayFullList22();
+        }
+        else {
+           if(!bluetoothAdapter.isEnabled())
+           {
+               Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+               startActivityForResult(enableBtIntent, 33);
+           }
+        }
 
 
     }
+
+    private void enableBluetooth(BluetoothAdapter bluetoothAdapter) {
+        if (!bluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_ENABLE_BT) {
+            BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+            enableBluetooth(bluetoothAdapter);
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                enableBluetooth(bluetoothAdapter);
+            } else {
+                Toast.makeText(this, "FFF"+requestCode, Toast.LENGTH_SHORT).show();
+            }
+        }
+        else  if (requestCode == 33){
+            Toast.makeText(this, "Bluetooth enabled", Toast.LENGTH_SHORT).show();
+
+        }
+    }
+
+    public static int countEnglishAlphabets(String word) {
+        int count = 0;
+        for (char c : word.toCharArray()) {
+            if (Character.isLetter(c) && c >= 'A' && c <= 'z') {
+                count++;
+            }
+        }
+        return count;
+    }
+    private static String getFirstFourChars(String input) {
+        if (input.length() >= 4) {
+            return input.substring(0, 4);
+        } else {
+            return input;
+        }
+    }
+    private static String getLastTwoChars(String input) {
+        if (input.length() >= 2) {
+            return input.substring(input.length() - 2);
+        } else {
+            return input;
+        }
+    }
+
     private static ArrayList<String> checkspecialindexxx(ArrayList<String> inputList) {
         ArrayList<String> result = new ArrayList<>();
 
@@ -315,7 +393,10 @@ UserModel userModel=new UserModel("name", "email", "phonenumber"
 
             }
             else {
-                String modifiedString = input.substring(0, 4) + ":" + input.substring(input.length() - 2);
+                String firstFourChars = getFirstFourChars(input);
+                String lastTwoChars = getLastTwoChars(input);
+                String  modifiedString = firstFourChars +":"+lastTwoChars;
+
                 result.add(modifiedString);
             }
 

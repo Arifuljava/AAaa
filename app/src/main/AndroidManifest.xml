@@ -22,17 +22,17 @@
             android:name=".ImageToTextActivity"
             android:exported="true"
             android:theme="@style/AppTheme">
-
-        </activity>
-        <activity
-            android:name=".SDKActivity"
-            android:exported="true"
-            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".SDKActivity"
+            android:exported="true"
+            android:theme="@style/AppTheme">
+
         </activity>
         <activity
             android:name=".localdatabase.RegistrationAcivity"

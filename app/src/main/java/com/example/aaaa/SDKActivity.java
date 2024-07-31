@@ -57,12 +57,12 @@ public class SDKActivity extends AppCompatActivity {
 
 
     public void enablebluetooth(View view) {
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.jjj);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realbitmap_blue);
         MyJavaClass myJavaClass=new MyJavaClass();
         myJavaClass.SendBitmap(bitmap, SDKActivity.this, new MyJavaClass.SuccessCallback() {
             @Override
             public void onSuccess(List<String> processedTextList) {
-                Log.e("Failed","Failed"+processedTextList);
+                Log.e("GetData","GetData"+processedTextList);
             }
         }, new MyJavaClass.FailureCallback() {
             @Override

@@ -32,6 +32,9 @@ public class MyJavaClass {
     static TextRecognitionManager textRecognitionManager ;
     public  void SendBitmap(Bitmap bitmapw, Context context,
                                   SuccessCallback successCallback, FailureCallback failureCallback) {
+        extractTextList.clear();
+        finalextractTextList.clear();
+        resultlist.clear();
 
 
         Bitmap bitmap = bitmapw;
@@ -41,12 +44,13 @@ public class MyJavaClass {
         textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
             @Override
             public void onSuccess(String getText) {
+
                 //
                 getText =  getText
                         .replace("i","1")
                         .replace("*",":")
                         .replace("L", "1")
-                        .replace("l", "|")
+                        .replace("l", "1")
                         .replace("s", "5")
                         .replace("S", "5")
                         .replace("a", "8")
@@ -63,6 +67,7 @@ public class MyJavaClass {
                         .replace("\"", ":")
                         .replace("(","|")
                         .replace(")","|");
+                Log.e("JJJJJ",""+getText);
 
                 //extreact primary text task
                 extractTextList = rowmanagement(getText);
@@ -71,15 +76,19 @@ public class MyJavaClass {
                 String  message = "";
                 String tasktargetrow;
                 for (int i =0; i < extractTextList.size(); i++) {
-                    tasktargetrow = extractTextList.get(i);
-                    message=message+"\n"+tasktargetrow;
-
-                    String data = processTextInEveryrowAndReturnNewListWithElement(tasktargetrow);
-                    Log.e("Fullcode",""+tasktargetrow.length());
-                    if(i==15)
+                    Log.e("HHHAAA"+i+15,""+extractTextList.size());
+                    if(extractTextList.get(i).length()<5)
                     {
-                        break;
+                        extractTextList.remove(i);
                     }
+                    else{
+                        tasktargetrow = extractTextList.get(i);
+                        message=message+"\n"+tasktargetrow;
+
+                        String data = processTextInEveryrowAndReturnNewListWithElement(tasktargetrow);
+                        Log.e("Fullcode",""+tasktargetrow);
+                    }
+
 
 
                 }
@@ -87,9 +96,7 @@ public class MyJavaClass {
 
                 for (int i =0; i < finalextractTextList.size(); i++) {
                     String  data = finalextractTextList.get(i);
-
                     if (data.length() < 4) {
-
                     }
                     else {
                         checking6value(data,i);
@@ -176,7 +183,6 @@ public class MyJavaClass {
         for (int i =0; i < stringArray.length; i++) {
             tasktargetrow = stringArray[i];
             finalextractTextList.add(tasktargetrow);
-
         }
     }
     public static List<String> rowmanagement(String primanytext) {
@@ -184,14 +190,20 @@ public class MyJavaClass {
         String[] rows = primanytext.split("\n");
         for (int i = 0; i < rows.length; i++) {
             String row = rows[i].trim();
-            if (row.length() > 25) {
+
                 extractTextList.add(row);
-            }
+
             Log.e("Row " + (i + 1), row);
 
         }
         return  extractTextList;
 
+    }
+    public static String removeSpecialCharactersAndSpaces(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.replaceAll("[^a-zA-Z0-9]", "");
     }
     private static void checking6value(String data, int index) {
         String specialCharacters = "!@#$%^&*()_+-=[]{}|;:,.<>?/";
@@ -212,6 +224,29 @@ public class MyJavaClass {
 
             }
             else {
+                data=removeSpecialCharactersAndSpaces(data);
+                List<String> substrings = new ArrayList<>();
+
+                for (int i = 0; i < data.length(); i += 6) {
+                    int endIndex = Math.min(i + 6, data.length());
+                    substrings.add(data.substring(i, endIndex));
+
+                }
+                List<String> formattedSubstrings = new ArrayList<>();
+
+                for (int i = 0; i < substrings.size(); i++) {
+                    String originalString = substrings.get(i);
+                    String formattedString;
+
+                    if (originalString.length() > 4) {
+                        formattedString = originalString.substring(0, 4) + ":" + originalString.substring(4);
+                    } else {
+                        formattedString = originalString;
+                    }
+                    Log.e("SUBStrings",""+formattedString);
+                    resultlist.add( formattedString.trim());
+
+                }
 
             }
         }

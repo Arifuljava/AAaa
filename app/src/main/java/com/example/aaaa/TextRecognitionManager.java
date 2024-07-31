@@ -1,6 +1,8 @@
 package com.example.aaaa;
 
 import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -28,6 +30,8 @@ public class TextRecognitionManager {
                     @Override
                     public void onSuccess(Text visionText) {
                         // Task completed successfully
+
+
                         String resultText = visionText.getText();
                         resultText =  resultText
                                 .replace("L", "1")

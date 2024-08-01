@@ -15,10 +15,16 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+
 
 public class ImageToTextActivity extends AppCompatActivity {
     TextView resulttext;
@@ -92,8 +98,8 @@ public class ImageToTextActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realbitmap_blue);
-       bitmap= addWhiteBackground(bitmap);
-        bitmap=zoomBitmap(bitmap, bitmap.getWidth() * 2, bitmap.getHeight() * 2);
+      // bitmap= toGrayscale(bitmap);
+        //bitmap=zoomBitmap(bitmap, bitmap.getWidth() * 2, bitmap.getHeight() * 2);
         try {
             realimage.setImageBitmap(bitmap);
             textRecognitionManager = new TextRecognitionManager();
@@ -105,6 +111,8 @@ public class ImageToTextActivity extends AppCompatActivity {
     }
 
     public void enablebluetooth(View view) {
+
+
         AttendenceSDK.SendBitmap(bitmap, ImageToTextActivity.this, new AttendenceSDK.SuccessCallback() {
             @Override
             public void onSuccess(List<String> processedTextList) {
@@ -117,6 +125,7 @@ public class ImageToTextActivity extends AppCompatActivity {
 
             }
         });
+
 
 
     }

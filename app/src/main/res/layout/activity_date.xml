@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DateActivity">
+    <RelativeLayout
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <ImageView
+            android:layout_centerHorizontal="true"
+            android:layout_width="250dp"
+            android:layout_height="150dp"
+            android:id="@+id/realimage"
+            ></ImageView>
+    </RelativeLayout>
+    <Button
+        android:layout_marginTop="10dp"
+        android:text="Text Extract"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/dddd"
+        android:onClick="enablebluetooth"
+        ></Button>
+</LinearLayout>

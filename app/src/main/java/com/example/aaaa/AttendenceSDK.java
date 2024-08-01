@@ -48,6 +48,7 @@ public class AttendenceSDK {
                     timelistResult=textClassificationManager.margeDateList(timelistResult);
                     timelistResult=textClassificationManager.sortByKey(timelistResult);
                     List<String> finaltimelist   = textClassificationManager.Dateconverttolist(timelistResult);
+                    finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
                    //for date
                     datelistResult=textClassificationManager.margeDateList(datelistResult);
                     datelistResult=textClassificationManager.replacedAndMakeDateClear(datelistResult);

@@ -4,6 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,13 +40,64 @@ public class ImageToTextActivity extends AppCompatActivity {
         setContentView(R.layout.activity_image_to_text);
         init();
     }
+    public Bitmap addWhiteBackground(Bitmap originalBitmap) {
+        Bitmap whiteBackgroundBitmap = Bitmap.createBitmap(
+                originalBitmap.getWidth(),
+                originalBitmap.getHeight(),
+                originalBitmap.getConfig()
+        );
+        Canvas canvas = new Canvas(whiteBackgroundBitmap);
+        canvas.drawColor(Color.RED);
+        canvas.drawBitmap(originalBitmap, 0, 0, null);
+        return whiteBackgroundBitmap;
+    }
+    public Bitmap toGrayscale(Bitmap bmpOriginal)
+    {
+        int width, height;
+        height = bmpOriginal.getHeight();
+        width = bmpOriginal.getWidth();
+
+        Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(bmpGrayscale);
+        Paint paint = new Paint();
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+        paint.setColorFilter(f);
+        c.drawBitmap(bmpOriginal, 0, 0, paint);
+        return bmpGrayscale;
+    }
+
+    public static Bitmap toGrayscale1(Bitmap srcImage) {
+
+        Bitmap bmpGrayscale = Bitmap.createBitmap(srcImage.getWidth(), srcImage.getHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bmpGrayscale);
+        Paint paint = new Paint();
+
+        ColorMatrix cm = new ColorMatrix();
+        cm.setSaturation(0);
+        paint.setColorFilter(new ColorMatrixColorFilter(cm));
+        canvas.drawBitmap(srcImage, 0, 0, paint);
+
+        return bmpGrayscale;
+    }
+    public Bitmap zoomBitmap(Bitmap bitmap, int newWidth, int newHeight) {
+        // Create a new bitmap with the specified width and height.
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+
+        return scaledBitmap;
+    }
     public void init() {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
-        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realimage_reed);
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realbitmap_blue);
+       bitmap= addWhiteBackground(bitmap);
+        bitmap=zoomBitmap(bitmap, bitmap.getWidth() * 2, bitmap.getHeight() * 2);
         try {
             realimage.setImageBitmap(bitmap);
             textRecognitionManager = new TextRecognitionManager();
+
 
         } catch (Exception exception) {
             exception.printStackTrace();
@@ -61,22 +117,7 @@ public class ImageToTextActivity extends AppCompatActivity {
 
             }
         });
-       /*
-        textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
-            @Override
-            public void onSuccess(String getText) {
-                getText=replaced(getText);
-                extractRowList = rowmanagement(getText);
-                extractFromRow();
 
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-
-            }
-        });
-        */
 
     }
 

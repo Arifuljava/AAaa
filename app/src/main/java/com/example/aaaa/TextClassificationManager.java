@@ -3,6 +3,7 @@ package com.example.aaaa;
 import static com.example.aaaa.AttendenceSDK.count_index;
 
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -19,6 +20,7 @@ public class TextClassificationManager {
     public static String replaceddata(String targettext)
     {
         return  targettext
+                .replace("%","3")
                 .replace("p","2")
                 .replace("h","1")
                 .replace("I","1")
@@ -460,12 +462,15 @@ Log.e("parts ",""+dataPoints);
 
         for (int i =0; i < datelistResult.size(); i++) {
             String kk = datelistResult.get(i);
-            if(Integer.parseInt(kk)>15)
+            if(!TextUtils.isEmpty(kk))
             {
-                count15to31++;
-            }
-            else {
-                countzeroto15++;
+                if(Integer.parseInt(kk)>15)
+                {
+                    count15to31++;
+                }
+                else {
+                    countzeroto15++;
+                }
             }
         }
         if(countzeroto15>count15to31)
@@ -601,6 +606,38 @@ Log.e("parts ",""+dataPoints);
         return  finalresultlist;
     }
     //make percentages
+//
+    public    List<String> replacedTime( List<String>  finaltimelist)
+    {
+        List<String> replacedlist = new ArrayList<>();
+       for(int  i=0;i<finaltimelist.size();i++)
+       {
+           String word= finaltimelist.get(i);
+           if(word.contains(":"))
+           {
+               word=replaceddata(word);
+           }
+           else {
+               String firsttwo = word.substring(0,2);
+               if(word.length()<3)
+               {
+                   String second=firsttwo;
+                   word=firsttwo ;
+               }
+               else {
+                   String second=word.substring(3,word.length());
+                   word=firsttwo+""+second;
+               }
+
+           }
+
+
+           replacedlist.add(i,word);
+
+       }
+        return  replacedlist;
+    }
+    //
 
 
 }

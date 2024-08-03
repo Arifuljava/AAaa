@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +41,10 @@ public class ImageToTextActivity extends AppCompatActivity {
     List<String> finalresult = new ArrayList<>();
     String previousdata = "";
     int count_date = 0;
+    private Matrix matrix_zoom;
+    private float scale = 1f;
+    private static final float ZOOM_IN_SCALE = 1.2f;
+    private static final float ZOOM_OUT_SCALE = 0.8f;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,18 +106,24 @@ public class ImageToTextActivity extends AppCompatActivity {
       // bitmap= toGrayscale(bitmap);
         //bitmap=zoomBitmap(bitmap, bitmap.getWidth() * 2, bitmap.getHeight() * 2);
         try {
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
             realimage.setImageBitmap(bitmap);
             textRecognitionManager = new TextRecognitionManager();
-
-
         } catch (Exception exception) {
             exception.printStackTrace();
         }
     }
 
     public void enablebluetooth(View view) {
+        ColorMatrix matrix = new ColorMatrix();
+        matrix.setSaturation(0);
 
+        ColorMatrixColorFilter filter = new ColorMatrixColorFilter(matrix);
+        realimage.setColorFilter(filter);
 
+     /*
         AttendenceSDK.SendBitmap(bitmap, ImageToTextActivity.this, new AttendenceSDK.SuccessCallback() {
             @Override
             public void onSuccess(List<String> processedTextList) {
@@ -126,6 +137,7 @@ public class ImageToTextActivity extends AppCompatActivity {
             }
         });
 
+      */
 
 
     }
@@ -503,3 +515,6 @@ Log.e("eeee"+timeList.size(),""+finaldatelist.size());
 
     }
 }
+/*
+
+ */

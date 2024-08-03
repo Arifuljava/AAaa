@@ -26,9 +26,9 @@ public class TextClassificationManager {
                 .replace("I","1")
                 .replace("İ","1")
                 .replace("i","1")
-                .replace("*",":")
+                .replace("*","1")
                 .replace("L", "1")
-                .replace("l", "|")
+                .replace("l", "1")
                 .replace("s", "5")
                 .replace("S", "5")
                 .replace("a", "8")
@@ -41,10 +41,10 @@ public class TextClassificationManager {
                 .replace("P","9")
                 .replace("D","0")
                 .replace("$","3")
-                .replace(".",":")
-                .replace("\"", ":")
-                .replace("(","|")
-                .replace(")","|");
+                .replace(".","2")
+                .replace("\"", "1")
+                .replace("(","1")
+                .replace(")","1");
     }
     public  String replaced(String  targettext)
     {
@@ -79,24 +79,49 @@ public class TextClassificationManager {
             if (row.length() > 3) {
 
                 Map<String, List<String>> group = createGroup(row, count_index);
-                System.out.println("Geroup " + (i + 1) + ": " + group);
+               // System.out.println("Geroup " + (i + 1) + ": " + group);
                 groupsList.add(group);
                 count_index++;
             }
-            System.out.println("Row " + (i + 1) + ": " + row);
+           // System.out.println("Row " + (i + 1) + ": " + row);
         }
-        System.out.println("Row " +groupsList);
+       // System.out.println("Row " +groupsList);
         return groupsList;
     }
     public static Map<String, List<String>> createGroup(String row,int index) {
         String groupNumber ="";
         List<String> dataPoints = new ArrayList<>();
         if (row.contains(" ")) {
+            String[] parts = row.split(" ");
+            /*
             row = "1 "+row;
             String[] parts = row.split(" ");
+            String  data="";
 
             for (int i = 1; i < parts.length; i++) {
-                dataPoints.add(parts[i]);
+                String  words = parts[i];
+
+                dataPoints.add(words);
+            }
+             */
+            String lastYearMonth = "";
+
+            for (String item : parts) {
+
+                if (item.matches("\\d{4}:")) {
+                    lastYearMonth = item; // Update last year-month
+                }
+                else if (item.matches("\\d{2}")) {
+                    if (!lastYearMonth.isEmpty()) {
+                        dataPoints.add(lastYearMonth + item);
+                    } else {
+                        dataPoints.add(item);
+                    }
+                }
+                else {
+                    dataPoints.add(item);
+                }
+
             }
         }
         else {
@@ -126,15 +151,146 @@ Log.e("parts ",""+dataPoints);
                     List<String> dateList_final = result.first;
                     List<String> timeList_final = result.second;
                     datelistrroup.put(""+i, dateList_final);
-                    timelistgroup.put(""+i, timeList_final);
+                    //timelistgroup.put(""+i, timeList_final);
                 }
 
+            }
+        }
+        //time
+
+        for (int i = 0; i < groupsList.size(); i++) {
+            if(i<groupsList.size())
+            {
+                List<String> targetList = groupsList.get(i).get(""+i);
+
+                if(targetList.size()>0&&targetList!=null)
+                {
+                    List<String> formattedList = formatTimes(targetList);
+                    timelistgroup.put(""+i, formattedList);
+                }
+            }
+        }
+        //time
+
+
+        return new Pair<>(datelistrroup, timelistgroup);
+
+    }
+    public static List<String> formatTimes(List<String> originalList) {
+        List<String> formattedList = new ArrayList<>();
+
+        for (int i = 0; i < originalList.size(); i++) {
+            String item = originalList.get(i);
+            if(item.length()>2)
+            {  String word ="";
+                if(item.contains(":"))
+                {
+                     word = extractDtae(item);
+                }
+                else {
+
+                   int  numbers =countNumbers(item);
+                   if (numbers>=6)
+                   {
+                       if(numbers==6)
+                       {
+word =splitIntoPairs(item);
+                       }
+                       else{
+                           word =splitIntoPairs(item);
+
+                       }
+                   }
+                   else if (numbers==5)
+                   {
+                       word =splitIntoPairs(item);
+                   }
+
+                }
+                formattedList.add(word);
+            }
+
+        }
+Log.e("KKKKKK",""+formattedList);
+        return formattedList;
+    }
+    public static  String splitIntoPairs(String input) {
+        String word = " ";
+        List<String> parts = new ArrayList<>();
+        for (int j = 0; j < input.length(); j += 2) {
+            parts.add(input.substring(j, Math.min(j + 2, input.length())));
+        }
+        String suffix = "";
+        String prefix = "";
+        if (parts.size()>2)
+        {
+            suffix=parts.get(1);
+            prefix=parts.get(2);
+            if(prefix.length()<2)
+            {
+                prefix="0"+prefix;
+            }
+        }
+        else{
+            suffix=parts.get(1);
+            prefix="00";
+        }
+        word=suffix+":"+prefix;
+        return word;
+
+    }
+    private static String extractDtae(String targetword) {
+        String extractDate ="";
+        if (targetword.length()>=7)
+        {
+            if(targetword.length()==7)
+            {
+                if (targetword.matches("\\d{4}:\\d{2}")) {
+                    extractDate = targetword.substring(2);
+                }
+                else{
+                    extractDate = targetword.substring(2);
+                }
+            }
+            else if(targetword.length()>=7)
+            {
+                if (targetword.matches("\\d{4}:\\d{2}")) {
+                    extractDate = targetword.substring(3);
+                }
+                else{
+                    extractDate = targetword.substring(3);
+                }
+            }
+
+        }
+       else if (targetword.length()==6)
+        {
+            int count = countDigitsAfterColon(targetword);
+
+            if(count>1)
+            {
+                extractDate = targetword.substring(1);
+            }
+            else {
+                Log.e("KKIIIII"+targetword,""+count);
+                extractDate = targetword.substring(2);
+                extractDate=extractDate+"0";
             }
 
 
         }
-        return new Pair<>(datelistrroup, timelistgroup);
-
+        else {
+            extractDate = targetword.substring(0);
+        }
+        return extractDate;
+    }
+    public static  int countDigitsAfterColon(String input) {
+        int colonIndex = input.indexOf(":");
+        if (colonIndex == -1) {
+            return 0;
+        }
+        String afterColon = input.substring(colonIndex + 1);
+        return afterColon.replaceAll("\\D", "").length();
     }
     private static int countColons(String text) {
         if (text == null || text.isEmpty()) {
@@ -246,12 +402,12 @@ Log.e("parts ",""+dataPoints);
             for (String datePart : dateList_target) {
                 dateList.add(datePart);
             }
-            //System.out.println("Group " + (i + 1) + ": " + timeList_target);
+
 
         }
 
 
-        System.out.println("HHHHHNNNNN" + timeList);
+        //System.out.println("HHHHHNNNNN" + timeList);
 
         return new Pair<>(dateList, timeList);
     }
@@ -303,7 +459,7 @@ Log.e("parts ",""+dataPoints);
         return  timeList;
     }
     //remove null data
-    //marge
+    //margeGeroup
 
     public   Map<String, List<String>> margeDateList( Map<String, List<String>> datelistResult)
     {

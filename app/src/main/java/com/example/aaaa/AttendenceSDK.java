@@ -43,13 +43,31 @@ public class AttendenceSDK {
                     Map<String, List<String>> datelistResult = result.first;
                     Map<String, List<String>> timelistResult = result.second;
                     List<Map<String, List<String>>> finaltimetList = textClassificationManager.convertMapToList(timelistResult);
-
-                   timelistResult=textClassificationManager.removenulldatafromtimelist(finaltimetList);
+                     timelistResult=textClassificationManager.removenulldatafromtimelist(finaltimetList);
+                     timelistResult=textClassificationManager.sortByKey(timelistResult);
+                    List<String> finaltimelist   = textClassificationManager.Dateconverttolist(timelistResult);
+                    finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
+                     Log.e("TimeList",""+finaltimelist);
+                    Log.e("TimeList",""+finaltimelist.size());
+                    //date
+                    datelistResult=textClassificationManager.margeDateList(datelistResult);
+                    datelistResult=textClassificationManager.replacedAndMakeDateClear(datelistResult);
+                    List<String> flattenedList   = textClassificationManager.Dateconverttolist(datelistResult);
+                    int detector =  textClassificationManager.determinecount(flattenedList);
+                    datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
+                    datelistResult=textClassificationManager.sortByKey(datelistResult);
+                    List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
+                    List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
+                    List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
+                    System.out.println("detector : "+finalResultFromSDK);
+                    /*
                     timelistResult=textClassificationManager.margeDateList(timelistResult);
                     timelistResult=textClassificationManager.sortByKey(timelistResult);
                     List<String> finaltimelist   = textClassificationManager.Dateconverttolist(timelistResult);
                     finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
+                     */
                    //for date
+                    /*
                     datelistResult=textClassificationManager.margeDateList(datelistResult);
                     datelistResult=textClassificationManager.replacedAndMakeDateClear(datelistResult);
                     List<String> flattenedList   = textClassificationManager.Dateconverttolist(datelistResult);
@@ -61,6 +79,7 @@ public class AttendenceSDK {
                     List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
                     System.out.println("detector : "+finalResultFromSDK);
                     successCallback.onSuccess(finalResultFromSDK);
+                     */
 
                     //Log.e("datelistResult",""+listOfLists);
 

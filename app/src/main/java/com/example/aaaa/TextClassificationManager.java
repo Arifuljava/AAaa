@@ -27,7 +27,7 @@ public class TextClassificationManager {
     public  static  String third = "12";
     public  static  String fourth = "16";
     public  static  String fifth = "16";
-    public  static  String fix = "19";
+    public  static  String sizth = "19";
 
 
     public static String replaceddata(String targettext)
@@ -907,37 +907,37 @@ Log.e("KKKKKK",""+formattedList);
         if (index==0)
         {
             int randomNumber = getRandomNumberInRange(50, 59);
-            String data = "07:"+randomNumber;
+            String data = first+":"+randomNumber;
             word=data;
         }
         else if (index==1)
         {
             int randomNumber = getRandomNumberInRange(1, 9);
-            String data = "12:0"+randomNumber;
+            String data = second+":0"+randomNumber;
             word=data;
         }
         else if (index==2)
         {
             int randomNumber = getRandomNumberInRange(40, 59);
-            String data = "12:"+randomNumber;
+            String data = third+":"+randomNumber;
             word=data;
         }
         else if (index==3)
         {
             int randomNumber = getRandomNumberInRange(30, 35);
-            String data = "16:"+randomNumber;
+            String data = fourth+":"+randomNumber;
             word=data;
         }
         else if (index==4)
         {
             int randomNumber = getRandomNumberInRange(53, 59);
-            String data = "16:"+randomNumber;
+            String data = fifth+":"+randomNumber;
             word=data;
         }
         else if (index==5)
         {
             int randomNumber = getRandomNumberInRange(1, 9);
-            String data = "19:0"+randomNumber;
+            String data = sizth+":0"+randomNumber;
             word=data;
         }
         word=replaceddata(word);
@@ -959,4 +959,32 @@ Log.e("KKKKKK",""+formattedList);
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
     }
+    //check minute
+    public    List<String> replacedbyTime60( List<String>  finaltimelist)
+    {
+        List<String> replacedlist = new ArrayList<>();
+        for(int  i=0;i<finaltimelist.size();i++) {
+            String word = finaltimelist.get(i);
+            if (word.contains(":")) {
+                String[] parts = word.split(":");
+                String minutes = parts[1];
+                if(Integer.parseInt(minutes)>59)
+                {
+                    int  index = i%6;
+                    word=replacedWith(index,i);
+                    word=replaceddata(word);
+                }
+                else{
+                    word=replaceddata(word);
+                }
+            }
+            else {
+                word=replaceddata(word);
+            }
+            replacedlist.add(i,word);
+        }
+        return replacedlist;
+            }
+
+    //check minute
 }

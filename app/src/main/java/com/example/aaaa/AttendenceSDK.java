@@ -49,6 +49,7 @@ public class AttendenceSDK {
                     List<String> finaltimelist   = textClassificationManager.Dateconverttolist(timelistResult);
                     finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
                     finaltimelist   = textClassificationManager.checkdoublecolonondata(finaltimelist);
+                    finaltimelist   = textClassificationManager.replacedbyTime60(finaltimelist);
                      Log.e("TimeList",""+finaltimelist);
                     Log.e("TimeList",""+finaltimelist.size());
                     //date

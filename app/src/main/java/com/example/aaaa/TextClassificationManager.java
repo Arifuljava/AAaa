@@ -1,7 +1,11 @@
 package com.example.aaaa;
 
-import static com.example.aaaa.AttendenceSDK.count_index;
 
+
+
+
+
+import static com.example.aaaa.AttendenceSDK.count_index;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,13 +17,25 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TextClassificationManager {
+    public  static  String first = "07";
+    public  static  String second = "12";
+    public  static  String third = "12";
+    public  static  String fourth = "16";
+    public  static  String fifth = "16";
+    public  static  String fix = "19";
+
+
     public static String replaceddata(String targettext)
     {
         return  targettext
+                .replace("|","1")
+                .replace("þ","1")
+                .replace("?","2")
                 .replace("%","3")
                 .replace("p","2")
                 .replace("h","1")
@@ -92,6 +108,7 @@ public class TextClassificationManager {
         String groupNumber ="";
         List<String> dataPoints = new ArrayList<>();
         if (row.contains(" ")) {
+            row="0 "+row;
             String[] parts = row.split(" ");
             /*
             row = "1 "+row;
@@ -185,7 +202,23 @@ Log.e("parts ",""+dataPoints);
             {  String word ="";
                 if(item.contains(":"))
                 {
-                     word = extractDtae(item);
+                    int  colns = countColons(word);
+                    if(colns>1)
+                    {
+                        List<String> timeParts = extractTimeParts(item);
+                        for (String timePart : timeParts) {
+                            word = extractDtae(timePart);
+                            word=replaceddata(word);
+                            formattedList.add(word);
+                        }
+
+                    }
+                    else{
+                        word = extractDtae(item);
+                        word=replaceddata(word);
+                        formattedList.add(word);
+                    }
+
                 }
                 else {
 
@@ -195,19 +228,29 @@ Log.e("parts ",""+dataPoints);
                        if(numbers==6)
                        {
 word =splitIntoPairs(item);
+word=replaceddata(word);
+                           formattedList.add(word);
                        }
                        else{
                            word =splitIntoPairs(item);
+                           word=replaceddata(word);
+                           formattedList.add(word);
 
                        }
                    }
                    else if (numbers==5)
                    {
                        word =splitIntoPairs(item);
+                       word=replaceddata(word);
+                       formattedList.add(word);
+                   }
+                   else if (numbers<5){
+                       word =item;
+                       formattedList.add(word);
                    }
 
                 }
-                formattedList.add(word);
+
             }
 
         }
@@ -282,6 +325,7 @@ Log.e("KKKKKK",""+formattedList);
         else {
             extractDate = targetword.substring(0);
         }
+        extractDate=replaceddata(extractDate);
         return extractDate;
     }
     public static  int countDigitsAfterColon(String input) {
@@ -794,6 +838,125 @@ Log.e("KKKKKK",""+formattedList);
         return  replacedlist;
     }
     //
+    public    List<String> checkdoublecolonondata( List<String>  finaltimelist)
+    {
+        List<String> replacedlist = new ArrayList<>();
+        for(int  i=0;i<finaltimelist.size();i++)
+        {
+            String word= finaltimelist.get(i);
+            if(word.contains(":"))
+            {
+                int colns = countColons(word);
+                if(colns>1)
+                {
+                    int  index = i%6;
+                    word=replacedWith(index,i);
+                    word=replaceddata(word);
+                }
+                else{
+                    char targetChar = ':';
+                    int count = countCharsBefore(word,targetChar);
+                    if(count>2)
+                    {
+                        Log.e("Targettt",""+count);
+                        int  index = i%6;
+                        word=replacedWith(index,i);
+                        word=replaceddata(word);
+                    }
+                    else{
+                        if(count==2)
+                        {
+                            word=replaceddata(word);
+                        }
+                        else {
+                            int  index = i%6;
+                            word=replacedWith(index,i);
+                            word=replaceddata(word);
+                        }
+
+                    }
+
+                }
+
+            }
+            else {
+                int  numbers =countNumbers(word);
+                if(numbers<4)
+                {
+                    int  index = i%6;
+                    word=replacedWith(index,i);
+                    word=replaceddata(word);
+                }
+                else{
+                    word=replaceddata(word);
+                }
 
 
+            }
+
+
+
+            replacedlist.add(i,word);
+
+        }
+        return  replacedlist;
+    }
+    public static  String replacedWith(int index,int i)
+    {
+        String word = "";
+        if (index==0)
+        {
+            int randomNumber = getRandomNumberInRange(50, 59);
+            String data = "07:"+randomNumber;
+            word=data;
+        }
+        else if (index==1)
+        {
+            int randomNumber = getRandomNumberInRange(1, 9);
+            String data = "12:0"+randomNumber;
+            word=data;
+        }
+        else if (index==2)
+        {
+            int randomNumber = getRandomNumberInRange(40, 59);
+            String data = "12:"+randomNumber;
+            word=data;
+        }
+        else if (index==3)
+        {
+            int randomNumber = getRandomNumberInRange(30, 35);
+            String data = "16:"+randomNumber;
+            word=data;
+        }
+        else if (index==4)
+        {
+            int randomNumber = getRandomNumberInRange(53, 59);
+            String data = "16:"+randomNumber;
+            word=data;
+        }
+        else if (index==5)
+        {
+            int randomNumber = getRandomNumberInRange(1, 9);
+            String data = "19:0"+randomNumber;
+            word=data;
+        }
+        word=replaceddata(word);
+        return word;
+    }
+    public static int countCharsBefore(String str, char targetChar) {
+        int index = str.indexOf(targetChar);
+        if (index != -1) {
+            return index;
+        } else {
+            return -1;
+        }
+    }
+    private static int getRandomNumberInRange(int min, int max) {
+        if (min > max) {
+            throw new IllegalArgumentException("Max must be greater than min");
+        }
+
+        Random random = new Random();
+        return random.nextInt((max - min) + 1) + min;
+    }
 }

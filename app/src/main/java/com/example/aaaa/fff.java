@@ -1,6 +1,30 @@
 package com.example.aaaa;
 
 public class fff {
+    /*
+     /*
+                    timelistResult=textClassificationManager.margeDateList(timelistResult);
+                    timelistResult=textClassificationManager.sortByKey(timelistResult);
+                    List<String> finaltimelist   = textClassificationManager.Dateconverttolist(timelistResult);
+                    finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
+                     */
+    //for date
+                    /*
+                    datelistResult=textClassificationManager.margeDateList(datelistResult);
+                    datelistResult=textClassificationManager.replacedAndMakeDateClear(datelistResult);
+                    List<String> flattenedList   = textClassificationManager.Dateconverttolist(datelistResult);
+                    int detector =  textClassificationManager.determinecount(flattenedList);
+                    datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
+                    datelistResult=textClassificationManager.sortByKey(datelistResult);
+                    List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
+                    List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
+                    List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
+                    System.out.println("detector : "+finalResultFromSDK);
+                    successCallback.onSuccess(finalResultFromSDK);
+                     */
+
+    //Log.e("datelistResult",""+listOfLists);
+
      /*
         listview.setLayoutManager(new LinearLayoutManager(this));
         rowDataList = new ArrayList<>();

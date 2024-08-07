@@ -50,22 +50,25 @@ public class AttendenceSDK {
                     finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
                     finaltimelist   = textClassificationManager.checkdoublecolonondata(finaltimelist);
                     finaltimelist   = textClassificationManager.replacedbyTime60(finaltimelist);
+                   /*
                      Log.e("TimeList",""+finaltimelist);
                     Log.e("TimeList",""+finaltimelist.size());
+                    */
                     //date
-                   /*
+
                     datelistResult=textClassificationManager.margeDateList(datelistResult);
                     datelistResult=textClassificationManager.replacedAndMakeDateClear(datelistResult);
                     List<String> flattenedList   = textClassificationManager.Dateconverttolist(datelistResult);
                     int detector =  textClassificationManager.determinecount(flattenedList);
-                    datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
+                  datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
                     datelistResult=textClassificationManager.sortByKey(datelistResult);
                     List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
-                    List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
-                    List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
-                    System.out.println("detector : "+finalResultFromSDK);
-                    successCallback.onSuccess(finalResultFromSDK);
-                    */
+                   // List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
+                  //  List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
+                    System.out.println("detector : "+datelistResult);
+                    System.out.println("detector : "+detector);
+                    successCallback.onSuccess(finalDateList);
+
 
 
                 }

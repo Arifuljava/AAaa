@@ -202,12 +202,14 @@ Log.e("parts ",""+dataPoints);
             {  String word ="";
                 if(item.contains(":"))
                 {
-                    int  colns = countColons(word);
+                    int  colns = countColons(item);
+                    Log.e("WWWWWW",""+colns);
                     if(colns>1)
                     {
                         List<String> timeParts = extractTimeParts(item);
                         for (String timePart : timeParts) {
                             word = extractDtae(timePart);
+
                             word=replaceddata(word);
                             formattedList.add(word);
                         }
@@ -692,17 +694,41 @@ Log.e("KKKKKK",""+formattedList);
         }
         return count;
     }
+    public static  int checkingindex = 0 ;
     public   Map<String, List<String>> replacedDate( Map<String, List<String>> datelistResult,int detector) {
         Map<String, List<String>> datelistrroup = new HashMap<>();
         int kk = detector;
         List<String> datechecking = new ArrayList<>();
-        for (int i = 0; i < datelistResult.size(); i++) {
-            String key = String.valueOf(i);
+        int mainkey = 0;
+
+        for (int i = 0; i < 15; i++) {
+            String key = String.valueOf(mainkey);
             List<String> dates = datelistResult.get(key);
-            datechecking = replacedwithcount(dates,kk);
-            datelistrroup.put("" + i, new ArrayList<>(datechecking));
-            kk++;
+            if (dates != null) {
+                String element = "";
+                if(kk<10)
+                {
+                    element="0"+kk;
+                }
+                else{
+                    element=""+kk;
+                }
+                //Log.e("hhhhhh : "+element,""+dates);
+                if(dates.contains(""+element))
+                {
+                   Log.e(kk+"gggggg : "+mainkey,""+dates);
+                     datechecking = replacedwithcount(dates,kk);
+                    datelistrroup.put("" + i, new ArrayList<>(datechecking));
+                    mainkey++;
+                }
+                else{
+
+                }
+            }
+
+           kk++;
         }
+
 
         return  datelistrroup;
     }

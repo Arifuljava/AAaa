@@ -35,11 +35,13 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realbitmap_blue);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realimage_reed);
+            /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
             bitmap=imageBitmapManager.toBloodBlack(bitmap);
             bitmap=imageBitmapManager.zoomInBitmap(bitmap);
+             */
             realimage.setImageBitmap(bitmap);
         }catch (Exception exception)
         {

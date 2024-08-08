@@ -1,10 +1,6 @@
 package com.example.aaaa;
 
 
-
-
-
-
 import static com.example.aaaa.AttendenceSDK.count_index;
 
 import android.text.TextUtils;
@@ -104,25 +100,115 @@ public class TextClassificationManager {
        // System.out.println("Row " +groupsList);
         return groupsList;
     }
-    public static Map<String, List<String>> createGroup(String row,int index) {
+    public static Map<String, List<String>> createGroup(String row, int index) {
+        String groupNumber ="";
+        List<String> dataPoints = new ArrayList<>();
+        List<String> finaldataPoints = new ArrayList<>();
+        if (row.contains(" ")) {
+            row="0 "+row;
+            String[] parts = row.split(" ");
+
+
+            String lastYearMonth = "";
+            String checkingdata ="";
+            for (int i = 1; i < parts.length; i++) {
+                String  item = parts[i];
+                if(item.length()>=6)
+                {
+
+
+
+                    if (item.matches("\\d{4}:")) {
+                        lastYearMonth = item; // Update last year-month
+                    }
+                    else if (item.matches("\\d{2}")) {
+                        if (!lastYearMonth.isEmpty()) {
+                            dataPoints.add(lastYearMonth + item);
+                        } else {
+                            dataPoints.add(item);
+                        }
+                    }
+                    else {
+                        dataPoints.add(item);
+                    }
+                }
+                else {
+                    if(i + 1 < parts.length)
+                    {
+                        String nextItem = parts[i + 1];
+
+                        if (nextItem.length() < 6) {
+                            dataPoints.add(item + nextItem);
+                            i++; // Skip the next item as it's merged
+                        } else {
+                            dataPoints.add(item);
+                        }
+                    }
+                    else {
+                        dataPoints.add(item);
+                    }
+
+
+                }
+
+            }
+
+
+
+        }
+        else {
+            groupNumber = row;
+            dataPoints.add(groupNumber);
+
+        }
+        for (String item : dataPoints) {
+            if (!item.isEmpty()) {
+                if(item.length()>1)
+                {
+                    finaldataPoints.add(item);
+                }
+
+            }
+        }
+        Log.e("parts ",""+finaldataPoints);
+        Map<String, List<String>> group = new HashMap<>();
+        group.put(""+index, finaldataPoints);
+        return group;
+    }
+    public static Map<String, List<String>> createGrou11p(String row,int index) {
         String groupNumber ="";
         List<String> dataPoints = new ArrayList<>();
         if (row.contains(" ")) {
             row="0 "+row;
             String[] parts = row.split(" ");
-            /*
-            row = "1 "+row;
-            String[] parts = row.split(" ");
-            String  data="";
 
-            for (int i = 1; i < parts.length; i++) {
-                String  words = parts[i];
 
-                dataPoints.add(words);
-            }
-             */
             String lastYearMonth = "";
+            String checkingdata ="";
+            for (int i = 1; i < parts.length; i++) {
+                String  item = parts[i];
 
+                    if (item.matches("\\d{4}:")) {
+                        lastYearMonth = item; // Update last year-month
+                    }
+                    else if (item.matches("\\d{2}")) {
+                        if (!lastYearMonth.isEmpty()) {
+                            dataPoints.add(lastYearMonth + item);
+                        } else {
+                            dataPoints.add(item);
+                        }
+                    }
+                    else {
+                        dataPoints.add(item);
+                    }
+
+
+
+            }
+
+
+
+            /*
             for (String item : parts) {
 
                 if (item.matches("\\d{4}:")) {
@@ -140,6 +226,7 @@ public class TextClassificationManager {
                 }
 
             }
+             */
         }
         else {
             groupNumber = row;
@@ -147,7 +234,7 @@ public class TextClassificationManager {
 
         }
 
-Log.e("parts ",""+dataPoints);
+Log.e("Groups ",""+dataPoints);
         Map<String, List<String>> group = new HashMap<>();
         group.put(""+index, dataPoints);
         return group;
@@ -352,6 +439,7 @@ Log.e("KKKKKK",""+formattedList);
         return count;
     }
     public static List<String> extractTimeParts(String input) {
+        /*
         List<String> result = new ArrayList<>();
         int firstColon = input.indexOf(':');
         int lastColon = input.lastIndexOf(':');
@@ -362,6 +450,25 @@ Log.e("KKKKKK",""+formattedList);
             if (lastColon + 3 <= input.length() && lastColon - 2 >= 0) {
                 result.add(input.substring(lastColon - 2, lastColon + 3));
             }
+        }
+
+        return result;
+         */
+        List<String> result = new ArrayList<>();
+        String regex = "(\\d{1,2}):(\\d{1,2})";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String leftPart = matcher.group(1);
+            String rightPart = matcher.group(2);
+            if (leftPart.length() == 1) {
+                leftPart = "0" + leftPart;
+            }
+            if (rightPart.length() == 1) {
+                rightPart = "0" + rightPart;
+            }
+
+            result.add(leftPart + ":" + rightPart);
         }
 
         return result;
@@ -387,8 +494,15 @@ Log.e("KKKKKK",""+formattedList);
                     int colonIndex = targetword.indexOf(":");
                     int prefix_start = colonIndex - 2;
                     int suffixend = colonIndex + 3;
+                    String prefix = "";
+                    if(prefix_start<0)
+                    {
+                        prefix = targetword.substring(0,colonIndex);
+                    }
+                    else{
+                        prefix = targetword.substring(prefix_start,colonIndex);
+                    }
 
-                    String prefix = targetword.substring(prefix_start,colonIndex);
                     String suffiex="";
                     if (suffixend>targetword.length())
                     {
@@ -985,6 +1099,10 @@ Log.e("KKKKKK",""+formattedList);
         Random random = new Random();
         return random.nextInt((max - min) + 1) + min;
     }
+    public static boolean containsSpecialCharacter(String str) {
+        String regex = "[^a-zA-Z0-9 ]"; // Matches anything that's not a letter, digit, or space
+        return str.matches(".*" + regex + ".*");
+    }
     //check minute
     public    List<String> replacedbyTime60( List<String>  finaltimelist)
     {
@@ -994,7 +1112,12 @@ Log.e("KKKKKK",""+formattedList);
             if (word.contains(":")) {
                 String[] parts = word.split(":");
                 String minutes = parts[1];
-                if(Integer.parseInt(minutes)>59)
+                if (containsSpecialCharacter(minutes)) {
+                    int  index = i%6;
+                    word=replacedWith(index,i);
+                    word=replaceddata(word);
+                }
+                else  if(Integer.parseInt(minutes)>59)
                 {
                     int  index = i%6;
                     word=replacedWith(index,i);

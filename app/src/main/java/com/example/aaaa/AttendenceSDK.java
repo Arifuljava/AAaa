@@ -63,11 +63,21 @@ public class AttendenceSDK {
                   datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
                     datelistResult=textClassificationManager.sortByKey(datelistResult);
                     List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
-                   // List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
-                  //  List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
-                    System.out.println("detector : "+datelistResult);
-                    System.out.println("detector : "+detector);
-                    successCallback.onSuccess(finalDateList);
+                   List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
+                   List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
+                 //   System.out.println("detector : "+finalResultFromSDK);
+                   // System.out.println("detector : "+detector);
+                    int itemsPerRow = 6;
+
+                    for (int i = 0; i < finalResultFromSDK.size(); i++) {
+                        System.out.print(finalResultFromSDK.get(i) + "\t");
+
+                        // Print a new line after every 6 items
+                        if ((i + 1) % itemsPerRow == 0) {
+                            System.out.println();  // Move to the next line
+                        }
+                    }
+                    successCallback.onSuccess(finalResultFromSDK);
 
 
 

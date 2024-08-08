@@ -1,5 +1,7 @@
 package com.example.aaaa.ImageSettings;
 
+import static com.example.aaaa.AttendenceSDK.count_index;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
@@ -15,7 +17,11 @@ import com.example.aaaa.AttendenceSDK;
 import com.example.aaaa.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ImageSettingsActivity extends AppCompatActivity {
     ImageBitmapManager imageBitmapManager;
@@ -35,7 +41,7 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realimage_reed);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.imagemonth);
             /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
@@ -89,22 +95,33 @@ String data = "1612:29161258";
         result.add(time2);
         return result;
     }
+    public static List<String> extractTimeStrings(String input) {
+        List<String> result = new ArrayList<>();
+        String regex = "(\\d{1,2}):(\\d{1,2})";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String leftPart = matcher.group(1);
+            String rightPart = matcher.group(2);
+            if (leftPart.length() == 1) {
+                leftPart = "0" + leftPart;
+            }
+            if (rightPart.length() == 1) {
+                rightPart = "0" + rightPart;
+            }
+
+            result.add(leftPart + ":" + rightPart);
+        }
+
+        return result;
+    }
     public void imagesettings(View view) {
-        int  colns = countColons(data);
 
-        if(colns>1)
-        {
-            List<String> timeParts = extractTimeParts(data);
-            Log.e("DDD",""+timeParts);
-        }
-        else{
-
-        }
 
         AttendenceSDK.SendBitmap(bitmap, ImageSettingsActivity.this, new AttendenceSDK.SuccessCallback() {
             @Override
             public void onSuccess(List<String> processedTextList) {
-                Log.e("GetData",""+processedTextList);
+                //Log.e("GetData",""+processedTextList);
             }
         }, new AttendenceSDK.FailureCallback() {
             @Override
@@ -114,6 +131,91 @@ String data = "1612:29161258";
             }
         });
 
+        //Map<String, List<String>> group = createGroup(" 2 020 7:56 0212:0 5 021 2:55 0217:03 |0217: 56 0220:06", count_index);
 
+
+    }
+    public static Map<String, List<String>> createGroup(String row, int index) {
+        String groupNumber ="";
+        List<String> dataPoints = new ArrayList<>();
+        List<String> finaldataPoints = new ArrayList<>();
+        if (row.contains(" ")) {
+            row="0 "+row;
+            String[] parts = row.split(" ");
+
+
+            String lastYearMonth = "";
+            String checkingdata ="";
+            for (int i = 1; i < parts.length; i++) {
+                String  item = parts[i];
+                if(item.length()>=6)
+                {
+                    if(i + 1 < parts.length)
+                    {
+                        String nextItem = parts[i + 1];
+                        if (nextItem.length() < 6) {
+                            item=item+""+nextItem;
+                            i++;
+                        } else {
+                            item=item+"";
+                        }
+                    }
+                    else{
+                        item=item;
+                    }
+
+
+                    if (item.matches("\\d{4}:")) {
+                        lastYearMonth = item; // Update last year-month
+                    }
+                    else if (item.matches("\\d{2}")) {
+                        if (!lastYearMonth.isEmpty()) {
+                            dataPoints.add(lastYearMonth + item);
+                        } else {
+                            dataPoints.add(item);
+                        }
+                    }
+                    else {
+                        dataPoints.add(item);
+                    }
+                }
+                else {
+                    if(i + 1 < parts.length)
+                    {
+                        String nextItem = parts[i + 1];
+
+                        if (nextItem.length() < 6) {
+                            dataPoints.add(item + nextItem);
+                            i++; // Skip the next item as it's merged
+                        } else {
+                            dataPoints.add(item);
+                        }
+                    }
+                    else {
+                        dataPoints.add(item);
+                    }
+
+
+                }
+
+            }
+
+
+
+        }
+        else {
+            groupNumber = row;
+            dataPoints.add(groupNumber);
+
+        }
+        for (String item : dataPoints) {
+            if (!item.isEmpty()) {
+                finaldataPoints.add(item);
+            }
+        }
+        Log.e("parts ",""+finaldataPoints);
+        Map<String, List<String>> group = new HashMap<>();
+        group.put(""+index, finaldataPoints);
+        return group;
     }
 }

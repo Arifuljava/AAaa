@@ -316,12 +316,30 @@ Log.e("Groups ",""+dataPoints);
                    {
                        if(numbers==6)
                        {
-word =splitIntoPairs(item);
+                           String seconditem = "";
+                           if(i>0)
+                           {
+                                seconditem = originalList.get(i-1);
+                           }
+                           else{
+                               seconditem="50";
+                           }
+
+
+word =splitIntoPairs(item,seconditem);
 word=replaceddata(word);
                            formattedList.add(word);
                        }
                        else{
-                           word =splitIntoPairs(item);
+                           String seconditem = "";
+                           if(i>0)
+                           {
+                               seconditem = originalList.get(i-1);
+                           }
+                           else{
+                               seconditem="50";
+                           }
+                           word =splitIntoPairs(item,seconditem);
                            word=replaceddata(word);
                            formattedList.add(word);
 
@@ -329,7 +347,15 @@ word=replaceddata(word);
                    }
                    else if (numbers==5)
                    {
-                       word =splitIntoPairs(item);
+                       String seconditem = "";
+                       if(i>0)
+                       {
+                           seconditem = originalList.get(i-1);
+                       }
+                       else{
+                           seconditem="50";
+                       }
+                       word =splitIntoPairs(item,seconditem);
                        word=replaceddata(word);
                        formattedList.add(word);
                    }
@@ -346,11 +372,16 @@ word=replaceddata(word);
 Log.e("KKKKKK",""+formattedList);
         return formattedList;
     }
-    public static  String splitIntoPairs(String input) {
+    public static  String splitIntoPairs(String input,String previousdata) {
         String word = " ";
         List<String> parts = new ArrayList<>();
+
         for (int j = 0; j < input.length(); j += 2) {
             parts.add(input.substring(j, Math.min(j + 2, input.length())));
+        }
+        List<String> previousdataparts = new ArrayList<>();
+        for (int j = 0; j < previousdata.length(); j += 2) {
+            previousdataparts.add(previousdata.substring(j, Math.min(j + 2, previousdata.length())));
         }
         String suffix = "";
         String prefix = "";
@@ -358,9 +389,17 @@ Log.e("KKKKKK",""+formattedList);
         {
             suffix=parts.get(1);
             prefix=parts.get(2);
+            String previousmin=previousdataparts.get(2);
             if(prefix.length()<2)
             {
-                prefix="0"+prefix;
+                if(Integer.parseInt(previousmin)>30)
+                {
+                    prefix="5"+prefix;
+                }
+                else{
+                    prefix="0"+prefix;
+                }
+
             }
         }
         else{
@@ -1112,6 +1151,14 @@ Log.e("KKKKKK",""+formattedList);
             if (word.contains(":")) {
                 String[] parts = word.split(":");
                 String minutes = parts[1];
+                if(minutes.length()>2)
+                {
+                    minutes=minutes.substring(0,2);
+                }
+                else{
+                    minutes=minutes;
+                }
+                Log.e("HHHAAAA",""+minutes);
                 if (containsSpecialCharacter(minutes)) {
                     int  index = i%6;
                     word=replacedWith(index,i);

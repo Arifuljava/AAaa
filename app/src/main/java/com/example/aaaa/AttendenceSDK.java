@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
 
+import com.example.aaaa.ImageSettings.Datamanagement;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,23 +24,27 @@ public class AttendenceSDK {
     }
     static TextRecognitionManager textRecognitionManager ;
     static  TextClassificationManager  textClassificationManager;
+    static Datamanagement datamanagement;
     public  static  int count_index = 0 ;
     public  static  void SendBitmap(Bitmap bitmapw, Context context,
                                     AttendenceSDK.SuccessCallback successCallback, AttendenceSDK.FailureCallback failureCallback) {
         count_index = 0;
         textRecognitionManager = new TextRecognitionManager();
         textClassificationManager = new TextClassificationManager();
+        datamanagement=new Datamanagement();
+
         Bitmap bitmap = bitmapw;
         textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
             @Override
-            public void onSuccess(String getfromextractapi) {
+            public void onSuccess(String getfromextractapi,List<String>xlist,List<String>ylist) {
                 getfromextractapi=textClassificationManager.replaced(getfromextractapi);
-                Log.e("getfromextractapi",""+getfromextractapi);
                 List<Map<String, List<String>>> groupsList = textClassificationManager.rowManagement(getfromextractapi);
+                groupsList=datamanagement.datamanagementfromrationxandy(groupsList,xlist);
                 Log.e("getfromextractapi",""+groupsList);
 
                 if(groupsList.size()>0)
                 {
+                   /*
                     Pair<Map<String, List<String>>, Map<String, List<String>>> result = textClassificationManager.createDateAndTimeGroup(groupsList);
                     Map<String, List<String>> datelistResult = result.first;
                     Map<String, List<String>> timelistResult = result.second;
@@ -50,10 +56,7 @@ public class AttendenceSDK {
                     finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
                     finaltimelist   = textClassificationManager.checkdoublecolonondata(finaltimelist);
                     finaltimelist   = textClassificationManager.replacedbyTime60(finaltimelist);
-                   /*
-                     Log.e("TimeList",""+finaltimelist);
-                    Log.e("TimeList",""+finaltimelist.size());
-                    */
+
                     //date
 
                     datelistResult=textClassificationManager.margeDateList(datelistResult);
@@ -65,8 +68,6 @@ public class AttendenceSDK {
                     List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
                    List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
                    List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
-                 //   System.out.println("detector : "+finalResultFromSDK);
-                   // System.out.println("detector : "+detector);
                     int itemsPerRow = 6;
 
                     for (int i = 0; i < finalResultFromSDK.size(); i++) {
@@ -78,6 +79,7 @@ public class AttendenceSDK {
                         }
                     }
                     successCallback.onSuccess(finalResultFromSDK);
+                    */
 
 
 

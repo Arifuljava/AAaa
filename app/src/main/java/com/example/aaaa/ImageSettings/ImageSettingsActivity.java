@@ -17,6 +17,8 @@ import com.example.aaaa.AttendenceSDK;
 import com.example.aaaa.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,7 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.imagemonth);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.imagemissing);
             /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
@@ -115,6 +117,21 @@ String data = "1612:29161258";
 
         return result;
     }
+    public static  boolean areInSameRow(List<Integer> numbers, int num1, int num2, int rowDifference) {
+        int minNumber = Collections.min(numbers);
+        int maxNumber = Collections.max(numbers);
+
+        int currentRowStart = minNumber;
+        while (currentRowStart <= maxNumber) {
+            int currentRowEnd = currentRowStart + rowDifference - 1;
+            if (num1 >= currentRowStart && num1 <= currentRowEnd &&
+                    num2 >= currentRowStart && num2 <= currentRowEnd) {
+                return true;
+            }
+            currentRowStart += rowDifference;
+        }
+        return false;
+    }
     public void imagesettings(View view) {
 
 
@@ -131,10 +148,29 @@ String data = "1612:29161258";
             }
         });
 
-        //Map<String, List<String>> group = createGroup(" 2 020 7:56 0212:0 5 021 2:55 0217:03 |0217: 56 0220:06", count_index);
-
 
     }
+    public static Map<String, List<String>> crerateMapusingSize(List<Integer> integerList, int detector) {
+        Map<String, List<String>> xlistmap = new HashMap<>();
+        int index = 0;
+        int i = 0;
+        while (i < integerList.size()) {
+            List<String> currentGroup = new ArrayList<>();
+            int currentValue = integerList.get(i);
+            currentGroup.add("" + currentValue);
+            while (i + 1 < integerList.size() && Math.abs(integerList.get(i + 1) - currentValue) < detector) {
+                i++;
+                currentValue = integerList.get(i);
+                currentGroup.add("" + currentValue);
+            }
+            xlistmap.put("" + index, currentGroup);
+            index++;
+            i++;
+        }
+
+        return xlistmap;
+    }
+
     public static Map<String, List<String>> createGroup(String row, int index) {
         String groupNumber ="";
         List<String> dataPoints = new ArrayList<>();

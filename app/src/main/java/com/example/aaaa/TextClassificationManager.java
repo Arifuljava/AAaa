@@ -389,7 +389,7 @@ Log.e("KKKKKK",""+formattedList);
         {
             suffix=parts.get(1);
             prefix=parts.get(2);
-            String previousmin=previousdataparts.get(2);
+            String previousmin=previousdataparts.get(1);
             if(prefix.length()<2)
             {
                 if(Integer.parseInt(previousmin)>30)

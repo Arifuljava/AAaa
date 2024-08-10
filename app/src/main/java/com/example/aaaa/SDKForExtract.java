@@ -65,7 +65,7 @@ public class SDKForExtract {
         textRecognitionManager = new TextRecognitionManager();
         textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
             @Override
-            public void onSuccess(String getText) {
+            public void onSuccess(String getText,List<String> xlist, List<String> ylist) {
                 getText=replaced(getText);
                 extractRowList = rowmanagement(getText);
                 extractFromRow();

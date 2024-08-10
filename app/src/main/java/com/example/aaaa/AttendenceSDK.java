@@ -40,14 +40,15 @@ public class AttendenceSDK {
                 getfromextractapi=textClassificationManager.replaced(getfromextractapi);
                 List<Map<String, List<String>>> groupsList = textClassificationManager.rowManagement(getfromextractapi);
                 groupsList=datamanagement.datamanagementfromrationxandy(groupsList,xlist);
-                Log.e("getfromextractapi",""+groupsList);
+
 
                 if(groupsList.size()>0)
                 {
-                   /*
+
                     Pair<Map<String, List<String>>, Map<String, List<String>>> result = textClassificationManager.createDateAndTimeGroup(groupsList);
                     Map<String, List<String>> datelistResult = result.first;
                     Map<String, List<String>> timelistResult = result.second;
+
                     List<Map<String, List<String>>> finaltimetList = textClassificationManager.convertMapToList(timelistResult);
                      timelistResult=textClassificationManager.removenulldatafromtimelist(finaltimetList);
                      timelistResult=textClassificationManager.sortByKey(timelistResult);
@@ -68,18 +69,10 @@ public class AttendenceSDK {
                     List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
                    List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
                    List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
-                    int itemsPerRow = 6;
 
-                    for (int i = 0; i < finalResultFromSDK.size(); i++) {
-                        System.out.print(finalResultFromSDK.get(i) + "\t");
-
-                        // Print a new line after every 6 items
-                        if ((i + 1) % itemsPerRow == 0) {
-                            System.out.println();  // Move to the next line
-                        }
-                    }
                     successCallback.onSuccess(finalResultFromSDK);
-                    */
+                  Log.e("finalResultFromSDK",""+finalResultFromSDK);
+
 
 
 

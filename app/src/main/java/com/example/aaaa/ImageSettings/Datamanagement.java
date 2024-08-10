@@ -16,12 +16,25 @@ public  class Datamanagement {
 
         List<Integer> integerList = convertStringListToIntegerList(xlist);
         integerList = sortListAscending(integerList);
+        integerList=filterList(integerList,300);
         Map<String, List<String>> crerateMapusingSizeMap=crerateMapusingSize(integerList,120);
         crerateMapusingSizeMap= cearedatalistfromsize(crerateMapusingSizeMap,groupsList,xlist);
         List<Map<String, List<String>>> result = convertMapToList(crerateMapusingSizeMap);
-
+        Log.e("integerList",""+integerList);
         Log.e("Sorted data",""+result);
         return result;
+    }
+    public static List<Integer> filterList(List<Integer> list, int maxDifference) {
+        for (int i = 0; i < list.size()-1; i++) {
+            int differ = list.get(i+1) - list.get(i);
+            Log.e("differ",""+differ);
+            if(differ>300)
+            {
+                list.remove(i);
+            }
+        }
+
+        return list;
     }
     public static List<Map<String, List<String>>> convertMapToList(Map<String, List<String>> inputMap) {
         List<Map<String, List<String>>> listOfMaps = new ArrayList<>();
@@ -61,6 +74,7 @@ public  class Datamanagement {
             String word=valueList.get(i);
             int index = xlist.indexOf(word);
             List<String> targetList = groupsList.get(index).get(""+index);
+
             mergedList=mergeLists(mergedList,targetList);
         }
         System.out.println("Key: " + mergedList);

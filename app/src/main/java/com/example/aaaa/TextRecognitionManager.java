@@ -33,9 +33,6 @@ public class TextRecognitionManager {
                     @Override
                     public void onSuccess(Text visionText) {
                         // Task completed successfully
-
-
-                        String resultText = visionText.getText();
                         //
                         String seconddata="";
                         List<String> xlist = new ArrayList<>();

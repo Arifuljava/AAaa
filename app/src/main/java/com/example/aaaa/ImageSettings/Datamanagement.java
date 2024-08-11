@@ -16,8 +16,8 @@ public  class Datamanagement {
 
         List<Integer> integerList = convertStringListToIntegerList(xlist);
         integerList = sortListAscending(integerList);
-        integerList=filterList(integerList,300);
-        Map<String, List<String>> crerateMapusingSizeMap=crerateMapusingSize(integerList,120);
+        integerList=filterList(integerList,400);
+        Map<String, List<String>> crerateMapusingSizeMap=crerateMapusingSize(integerList,80);
         crerateMapusingSizeMap= cearedatalistfromsize(crerateMapusingSizeMap,groupsList,xlist);
         List<Map<String, List<String>>> result = convertMapToList(crerateMapusingSizeMap);
         Log.e("integerList",""+integerList);
@@ -28,7 +28,7 @@ public  class Datamanagement {
         for (int i = 0; i < list.size()-1; i++) {
             int differ = list.get(i+1) - list.get(i);
             Log.e("differ",""+differ);
-            if(differ>300)
+            if(differ>maxDifference)
             {
                 list.remove(i);
             }
@@ -38,12 +38,21 @@ public  class Datamanagement {
     }
     public static List<Map<String, List<String>>> convertMapToList(Map<String, List<String>> inputMap) {
         List<Map<String, List<String>>> listOfMaps = new ArrayList<>();
-
+        if (inputMap != null) {
+            for (int i = 0; i < inputMap.size(); i++) {
+                List<String> valueList = inputMap.get("" + i);
+                Map<String, List<String>> singleEntryMap = new HashMap<>();
+                singleEntryMap.put(""+i, valueList);
+                listOfMaps.add(singleEntryMap);
+            }
+        }
+        /*
         for (Map.Entry<String, List<String>> entry : inputMap.entrySet()) {
             Map<String, List<String>> singleEntryMap = new HashMap<>();
             singleEntryMap.put(entry.getKey(), entry.getValue());
             listOfMaps.add(singleEntryMap);
         }
+         */
 
         return listOfMaps;
     }
@@ -51,6 +60,15 @@ public  class Datamanagement {
     {
         Map<String, List<String>> datalistmapp = new HashMap<>();
         int  index = 0;
+        if (crerateMapusingSizeMap != null) {
+            for (int i = 0; i < crerateMapusingSizeMap.size(); i++) {
+                List<String> valueList = crerateMapusingSizeMap.get("" + i);
+                List<String> listfrommain= makelistfromsubandlist(valueList,xlist,groupsList);
+                datalistmapp.put(""+i,listfrommain);
+            }
+        }
+
+        /*
         for (Map.Entry<String, List<String>> entry : crerateMapusingSizeMap.entrySet()) {
             String key = entry.getKey();
             List<String> valueList = entry.getValue();
@@ -58,6 +76,7 @@ public  class Datamanagement {
             datalistmapp.put(""+index,listfrommain);
             index++;
         }
+         */
         System.out.println("Value List: " + datalistmapp);
         return datalistmapp;
     }

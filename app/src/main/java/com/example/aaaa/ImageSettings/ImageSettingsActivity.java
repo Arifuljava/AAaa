@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -43,18 +44,24 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.imagemissing);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realimage_reed);
             /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
             bitmap=imageBitmapManager.toBloodBlack(bitmap);
             bitmap=imageBitmapManager.zoomInBitmap(bitmap);
              */
+            bitmap = rotateBitmap(bitmap, 90);
             realimage.setImageBitmap(bitmap);
         }catch (Exception exception)
         {
 
         }
+    }
+    public static Bitmap rotateBitmap(Bitmap source, float angle) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
     private static int countColons(String text) {
         if (text == null || text.isEmpty()) {
@@ -135,6 +142,7 @@ String data = "1612:29161258";
     public void imagesettings(View view) {
 
 
+
         AttendenceSDK.SendBitmap(bitmap, ImageSettingsActivity.this, new AttendenceSDK.SuccessCallback() {
             @Override
             public void onSuccess(List<String> processedTextList) {
@@ -148,7 +156,27 @@ String data = "1612:29161258";
             }
         });
 
-
+        List<String> oir = new ArrayList<>();
+        oir.add("03");
+        oir.add("03");
+        oir.add("\0");
+        oir.add("\0");
+        oir.add("\0");
+        oir.add("03");
+       String mostFrequentValue = findSecondMostFrequentValue(oir);
+        //Log.e("Failed","failed"+mostFrequentValue);
+    }
+    private static String findSecondMostFrequentValue(List<String> list) {
+        Map<String, Integer> frequencyMap = new HashMap<>();
+        for (String value : list) {
+            frequencyMap.put(value, frequencyMap.getOrDefault(value, 0) + 1);
+        }
+        List<Map.Entry<String, Integer>> sortedEntries = new ArrayList<>(frequencyMap.entrySet());
+        sortedEntries.sort(Map.Entry.<String, Integer>comparingByValue().reversed());
+        if (sortedEntries.size() > 1) {
+            return sortedEntries.get(1).getKey();
+        }
+        return sortedEntries.isEmpty() ? null : sortedEntries.get(0).getKey();
     }
     public static Map<String, List<String>> crerateMapusingSize(List<Integer> integerList, int detector) {
         Map<String, List<String>> xlistmap = new HashMap<>();

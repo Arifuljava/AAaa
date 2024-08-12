@@ -5,9 +5,11 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.Pair;
 
+import com.example.aaaa.ImageSettings.CheckinTwoRationmanagement;
 import com.example.aaaa.ImageSettings.Datamanagement;
 import com.example.aaaa.ImageSettings.DateManagement;
 import com.example.aaaa.ImageSettings.FirstTimeManagement;
+import com.example.aaaa.ImageSettings.MargedateAndTime;
 import com.example.aaaa.ImageSettings.SecondDateManagement;
 import com.example.aaaa.ImageSettings.TimeDataManagement;
 
@@ -29,6 +31,8 @@ public class AttendenceSDK {
     static DateManagement dateManagement;
     static FirstTimeManagement firstTimeManagement;
     static SecondDateManagement secondDateManagement;
+    static MargedateAndTime margedateAndTime;
+    static CheckinTwoRationmanagement checkinTwoRationmanagement;
     public  static  int count_index = 0 ;
     public  static  void SendBitmap(Bitmap bitmapw, Context context,
                                     AttendenceSDK.SuccessCallback successCallback, AttendenceSDK.FailureCallback failureCallback) {
@@ -40,6 +44,8 @@ public class AttendenceSDK {
         dateManagement=new DateManagement();
         firstTimeManagement=new FirstTimeManagement();
         secondDateManagement=new SecondDateManagement();
+        margedateAndTime=new MargedateAndTime();
+        checkinTwoRationmanagement=new CheckinTwoRationmanagement();
 
         Bitmap bitmap = bitmapw;
         textRecognitionManager.recognizeText(bitmap, new TextRecognitionManager.TextRecognitionCallback() {
@@ -47,96 +53,28 @@ public class AttendenceSDK {
             public void onSuccess(String getfromextractapi,List<String>xlist,List<String>ylist) {
                 getfromextractapi=textClassificationManager.replaced(getfromextractapi);
                 List<Map<String, List<String>>> groupsList = textClassificationManager.rowManagement(getfromextractapi);
-               groupsList=datamanagement.datamanagementfromrationxandy(groupsList,ylist);
+                List<String> listfromx=checkinTwoRationmanagement.checkingxandy(groupsList,xlist);
+                List<String> listfromy=checkinTwoRationmanagement.checkingxandy(groupsList,ylist);
+                if(listfromx.size()>listfromy.size())
+                {
 
-                Log.e("timelistResult",""+groupsList);
+                }
+                else{
+
+                }
+                   /*
+                    groupsList=datamanagement.datamanagementfromrationxandy(groupsList,ylist);
                 if(groupsList.size()>0)
                 {
                     List<String> finaltimelist = firstTimeManagement.managementTime(groupsList);
                     Log.e("finalResultFromSDK",""+finaltimelist);
-                    List<String> datelist =    secondDateManagement.managementdate(groupsList);
-                    List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(datelist,finaltimelist);
-                    List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
-                    Log.e("datelist",""+finalResultFromSDK);
-                    //FirstPartTime
-                   /*
-                    Pair<Map<String, List<String>>, Map<String, List<String>>> resultTime = timeDataManagement.createDateAndTimeGroup(groupsList);
-                    Map<String, List<String>> timelistResult = resultTime.second;
-                    Log.e("timelistResult",""+timelistResult);
-                    */
-                    //secondpart date
-                  //  Pair<Map<String, List<String>>, Map<String, List<String>>> resultDate= dateManagement.createDateAndTimeGroup(groupsList);
-                   // Map<String, List<String>> datelistResult = resultDate.first;
-//
-                   // datelistResult=dateManagement.margeDateList(datelistResult);
-                  //  datelistResult=dateManagement.replacedAndMakeDateClear(datelistResult);
-                    //List<String> flattenedList   = dateManagement.Dateconverttolist(datelistResult);
-                    //nt detector =  dateManagement.determinecount(flattenedList);
-                    //datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
-                    //create list for max and second max value
-                    //List<String> maxvaluelist=dateManagement.makeMaxStringList(datelistResult);
-                    /*
-                    datelistResult = DateManagement.updateMapValues(datelistResult,detector);
-                    flattenedList   = dateManagement.Dateconverttolist(datelistResult);
-                    flattenedList=dateManagement.sortDateListAscending(flattenedList);
-                     */
-                    /*
-                    datelistResult=dateManagement.sortByKey(datelistResult);
-                    List<String> finalDateList   = dateManagement.Dateconverttolist(datelistResult);
-                    finalDateList=dateManagement.sortDateListAscending(finalDateList);
-                     */
+                   // List<String> datelist =    secondDateManagement.managementdate(groupsList);
+                   // List<String> finalResultFromSDK=   margedateAndTime.dateandtimemarge(finaltimelist,datelist);
 
-
-
-                 //   Log.e("datelistResult",""+datelistResult);
-                  /*
-
-                    List<Map<String, List<String>>> finaltimetList = timeDataManagement.convertMapToList(timelistResult);
-                    timelistResult=timeDataManagement.removenulldatafromtimelist(finaltimetList);
-                    timelistResult=timeDataManagement.sortByKey(timelistResult);
-                    List<String> finaltimelist   = timeDataManagement.Dateconverttolist(timelistResult);
-                    finaltimelist   = timeDataManagement.replacedTime(finaltimelist);
-                    finaltimelist   = timeDataManagement.checkdoublecolonondata(finaltimelist);
-                    finaltimelist   = timeDataManagement.replacedbyTime60(finaltimelist);
-
-                    Log.e("timelistResult",""+finaltimelist);
-                    Log.e("finalResultFromSDK",""+finaltimelist);
-                   */
-
-                    /*
-                    Pair<Map<String, List<String>>, Map<String, List<String>>> result = textClassificationManager.createDateAndTimeGroup(groupsList);
-                    Map<String, List<String>> datelistResult = result.first;
-                    Map<String, List<String>> timelistResult = result.second;
-
-                    List<Map<String, List<String>>> finaltimetList = textClassificationManager.convertMapToList(timelistResult);
-                     timelistResult=textClassificationManager.removenulldatafromtimelist(finaltimetList);
-                     timelistResult=textClassificationManager.sortByKey(timelistResult);
-
-                    List<String> finaltimelist   = textClassificationManager.Dateconverttolist(timelistResult);
-                    finaltimelist   = textClassificationManager.replacedTime(finaltimelist);
-                    finaltimelist   = textClassificationManager.checkdoublecolonondata(finaltimelist);
-                    finaltimelist   = textClassificationManager.replacedbyTime60(finaltimelist);
-
-                    //date
-
-                    datelistResult=textClassificationManager.margeDateList(datelistResult);
-                    datelistResult=textClassificationManager.replacedAndMakeDateClear(datelistResult);
-                    List<String> flattenedList   = textClassificationManager.Dateconverttolist(datelistResult);
-                    int detector =  textClassificationManager.determinecount(flattenedList);
-                  datelistResult=textClassificationManager.replacedDate(datelistResult,detector);
-                    datelistResult=textClassificationManager.sortByKey(datelistResult);
-                    List<String> finalDateList   = textClassificationManager.Dateconverttolist(datelistResult);
-                   List<String> finalresultwithpercentages   = textClassificationManager.makefinallistfordateandTime(finalDateList,finaltimelist);
-                   List<String> finalResultFromSDK   = textClassificationManager.determinepercentages(finalresultwithpercentages);
-
-                    successCallback.onSuccess(finalResultFromSDK);
-                  Log.e("finalResultFromSDK",""+flattenedList);
-                     */
-
-
-
+                    //Log.e("datelist",""+finalResultFromSDK);
 
                 }
+                    */
 
 
             }

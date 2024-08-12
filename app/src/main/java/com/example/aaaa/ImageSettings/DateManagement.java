@@ -522,38 +522,7 @@ public class DateManagement {
         int kk = detector;
         List<String> datechecking = new ArrayList<>();
         int mainkey = 0;
-        int i = 0;
-        for (Map.Entry<String, List<String>> entry : datelistResult.entrySet()) {
-            String key = entry.getKey();
-            List<String> dates = entry.getValue();
-            if (dates != null) {
-                String element = "";
-                if(kk<10)
-                {
-                    element="0"+kk;
-                }
-                else{
-                    element=""+kk;
-                }
-                //Log.e("hhhhhh : "+element,""+dates);
-                if(dates.contains(""+element))
-                {
-                    Log.e(kk+"gggggg : "+mainkey,""+dates);
-                    datechecking = replacedwithcount(dates,kk);
-                    datelistrroup.put("" + i, new ArrayList<>(datechecking));
-                    mainkey++;
-                }
-                else{
-                    Log.e(kk+"gggggg : "+dates,""+element);
-                }
-            }
 
-            kk++;
-            i++;
-
-        }
-
-      /*
         for (int i = 0; i < 15; i++) {
             String key = String.valueOf(mainkey);
             List<String> dates = datelistResult.get(key);
@@ -582,7 +551,7 @@ public class DateManagement {
 
            kk++;
         }
-       */
+
 
 
         return  datelistrroup;

@@ -17,9 +17,12 @@ import android.widget.TextView;
 import com.example.aaaa.AttendenceSDK;
 import com.example.aaaa.R;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,19 +47,53 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.realimage_reed);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.dddddd);
             /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
             bitmap=imageBitmapManager.toBloodBlack(bitmap);
             bitmap=imageBitmapManager.zoomInBitmap(bitmap);
              */
-            bitmap = rotateBitmap(bitmap, 90);
+            bitmap = rotateBitmap(bitmap, 0);
             realimage.setImageBitmap(bitmap);
         }catch (Exception exception)
         {
 
         }
+    }
+    public void createdatamanagement(){
+        List<String> userdatagiven = new ArrayList<>();
+        userdatagiven.add("08:00");
+        userdatagiven.add("12:00");
+        userdatagiven.add("13:00");
+        userdatagiven.add("16:00");
+        int timelength = userdatagiven.size();
+        List<String> datalist = new ArrayList<>();
+        datalist.add("12:04");
+        datalist.add("12:50");
+        datalist.add("16:04");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+        List<String> result = new ArrayList<>();
+        for (String data : datalist) {
+            boolean added = false;
+            for (int i = 0; i < userdatagiven.size()-1; i++) {
+                try {
+                    Date time1 = sdf.parse(userdatagiven.get(i));
+                    Date time2 = sdf.parse(userdatagiven.get(i + 1));
+                    Date dataTime = sdf.parse(data);
+                    long midpointMillis =time1.getTime() + (time1.getTime() + time2.getTime()) / 2;
+                    Date checkingdate = sdf.parse("12:04");
+                    long midcheckingdate = checkingdate.getTime();
+                    if(midcheckingdate<midpointMillis) 
+                    {
+                        Log.e("AAAAA","ffffff");
+                    }
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
     }
     public static Bitmap rotateBitmap(Bitmap source, float angle) {
         Matrix matrix = new Matrix();
@@ -142,6 +179,7 @@ String data = "1612:29161258";
     public void imagesettings(View view) {
 
 
+        createdatamanagement();
 
         AttendenceSDK.SendBitmap(bitmap, ImageSettingsActivity.this, new AttendenceSDK.SuccessCallback() {
             @Override
@@ -155,6 +193,7 @@ String data = "1612:29161258";
 
             }
         });
+
 
         List<String> oir = new ArrayList<>();
         oir.add("03");

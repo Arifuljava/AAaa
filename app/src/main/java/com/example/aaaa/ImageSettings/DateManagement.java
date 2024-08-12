@@ -516,7 +516,7 @@ public class DateManagement {
         }
         return dateList;
     }
-    public   Map<String, List<String>> replacedDate( Map<String, List<String>> datelistResult,int detector) {
+    public   Map<String, List<String>> replacedDate( Map<String, List<String>> datelistResult,int detector,int sizzzee) {
 
         Map<String, List<String>> datelistrroup = new HashMap<>();
         int kk = detector;
@@ -540,7 +540,7 @@ public class DateManagement {
                 if(dates.contains(""+element))
                 {
                    Log.e(kk+"gggggg : "+mainkey,""+dates);
-                     datechecking = replacedwithcount(dates,kk);
+                     datechecking = replacedwithcount(dates,kk,sizzzee);
                     datelistrroup.put("" + i, new ArrayList<>(datechecking));
                     mainkey++;
                 }
@@ -556,14 +556,14 @@ public class DateManagement {
 
         return  datelistrroup;
     }
-    public static List<String>  replacedwithcount(List<String> dates,int detector) {
+    public static List<String>  replacedwithcount(List<String> dates,int detector,int sizeeee) {
         List<String> datechecking = new ArrayList<>();
         if(dates.size()==0 || dates==null)
         {
             datechecking = dates;
         }
         else {
-            int size= dates.size();
+            int size=sizeeee;
             if(size>6)
             {
                 size = 6 ;

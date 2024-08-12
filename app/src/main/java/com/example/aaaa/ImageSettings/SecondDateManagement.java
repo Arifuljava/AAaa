@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class SecondDateManagement {
     static DateManagement dateManagement;
-    public  static   List<String> managementdate(List<Map<String, List<String>>> groupsList){
+    public  static   List<String> managementdate(List<Map<String, List<String>>> groupsList,List<String> userdatagiven){
         List<String> datelist = new ArrayList<>();
         if(!groupsList.isEmpty())
         {
@@ -23,7 +23,7 @@ public class SecondDateManagement {
             datelistResult=dateManagement.sortByKey(datelistResult);
             List<String> flatteneddateList   = dateManagement.Dateconverttolist(datelistResult);
             int detector =  dateManagement.determinecount(flatteneddateList);
-            datelistResult=dateManagement.replacedDate(datelistResult,detector);
+            datelistResult=dateManagement.replacedDate(datelistResult,detector,userdatagiven.size());
             datelistResult=dateManagement.sortByKey(datelistResult);
             datelist=dateManagement.Dateconverttolist(datelistResult);;
             Log.e("JJJJJJJ",""+datelist);

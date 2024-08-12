@@ -47,34 +47,97 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.dddddd);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.imagemissing);
             /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
             bitmap=imageBitmapManager.toBloodBlack(bitmap);
             bitmap=imageBitmapManager.zoomInBitmap(bitmap);
              */
-            bitmap = rotateBitmap(bitmap, 0);
+            bitmap = rotateBitmap(bitmap, 90);
             realimage.setImageBitmap(bitmap);
         }catch (Exception exception)
         {
 
         }
     }
+    public  static  List<String> createrange( List<String> userdatagiven){
+        List<String> createrangelist=new ArrayList<>();
+        for (int i = 0; i < userdatagiven.size()-1; i++) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                Date time1 = sdf.parse(userdatagiven.get(i));
+                Date time2 = sdf.parse(userdatagiven.get(i + 1));
+                Log.e(""+userdatagiven.get(i),""+time1.getTime());
+               long midpointMillis =time1.getTime() + (time2.getTime() - time1.getTime()) / 2;
+               createrangelist.add(""+midpointMillis);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return createrangelist;
+
+    }
     public void createdatamanagement(){
         List<String> userdatagiven = new ArrayList<>();
         userdatagiven.add("08:00");
         userdatagiven.add("12:00");
         userdatagiven.add("13:00");
-        userdatagiven.add("16:00");
+        userdatagiven.add("17:00");
+       userdatagiven.add("18:00");
+       userdatagiven.add("20:00");
+        List<String> createrangelist =createrange(userdatagiven);
+        Log.e("createrangelist",""+createrangelist);
+        List<String> datalist = new ArrayList<>();
+        List<String> updatetimelist = new ArrayList<>();
+        for(int ll =0;ll<userdatagiven.size();ll++)
+        {
+            updatetimelist.add("9999");
+        }
+        for (int k=0;k<datalist.size();k++) {
+            String data = datalist.get(k);
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            try {
+                Date dataTime = sdf.parse(data);
+                long checkingTime = dataTime.getTime();
+                Log.e("checkingTime : "+data,""+checkingTime);
+
+
+                for (int i = 0; i < createrangelist.size(); i++) {
+                    long rangeTime = Long.parseLong(createrangelist.get(i));
+
+                    if (checkingTime < rangeTime) {
+                        updatetimelist.set(i, data);
+                        Log.e("Data : " + (i + 1), "" + data);
+                        break;
+                    }
+
+                    // If checkingTime is larger than all range times, set it to the last entry
+                    if (i == createrangelist.size() - 1 && checkingTime >= rangeTime) {
+                        updatetimelist.set(i + 1, data);
+                        Log.e("Data : " + (i + 2), "" + data);
+                    }
+                }
+
+                Log.e("updatetimelist", "" + updatetimelist);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        /*
         int timelength = userdatagiven.size();
         List<String> datalist = new ArrayList<>();
         datalist.add("12:04");
-        datalist.add("12:50");
-        datalist.add("16:04");
+        datalist.add("12:55");
+        datalist.add("17:04");
+        datalist.add("17:57");
+        datalist.add("20:07");
+      //  datalist.add("16:04");
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        List<String> result = new ArrayList<>();
-        for (String data : datalist) {
+        List<String> result = new ArrayList<>();//String data : datalist
+        for (int k=0;k<datalist.size();k++) {
+            String data=datalist.get(k);
             boolean added = false;
             for (int i = 0; i < userdatagiven.size()-1; i++) {
                 try {
@@ -82,17 +145,21 @@ public class ImageSettingsActivity extends AppCompatActivity {
                     Date time2 = sdf.parse(userdatagiven.get(i + 1));
                     Date dataTime = sdf.parse(data);
                     long midpointMillis =time1.getTime() + (time1.getTime() + time2.getTime()) / 2;
-                    Date checkingdate = sdf.parse("12:04");
-                    long midcheckingdate = checkingdate.getTime();
-                    if(midcheckingdate<midpointMillis) 
+                    long midcheckingdate = dataTime.getTime();
+                    if(midcheckingdate<midpointMillis)
                     {
-                        Log.e("AAAAA","ffffff");
+                        Log.e("Get",""+data);
+                        break;
                     }
-                } catch (ParseException e) {
+                    else{
+                        Log.e("Missing",""+userdatagiven.get(i));
+                    }
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
         }
+         */
 
     }
     public static Bitmap rotateBitmap(Bitmap source, float angle) {
@@ -177,6 +244,7 @@ String data = "1612:29161258";
         return false;
     }
     public void imagesettings(View view) {
+       // createdatamanagement();
 
 
         createdatamanagement();
@@ -195,15 +263,7 @@ String data = "1612:29161258";
         });
 
 
-        List<String> oir = new ArrayList<>();
-        oir.add("03");
-        oir.add("03");
-        oir.add("\0");
-        oir.add("\0");
-        oir.add("\0");
-        oir.add("03");
-       String mostFrequentValue = findSecondMostFrequentValue(oir);
-        //Log.e("Failed","failed"+mostFrequentValue);
+
     }
     private static String findSecondMostFrequentValue(List<String> list) {
         Map<String, Integer> frequencyMap = new HashMap<>();

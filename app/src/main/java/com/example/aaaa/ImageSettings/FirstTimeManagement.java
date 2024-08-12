@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class FirstTimeManagement {
     static TimeDataManagement timeDataManagement;
-    public static  List<String> managementTime(List<Map<String, List<String>>> groupsList){
+    public static  List<String> managementTime(List<Map<String, List<String>>> groupsList,List<String> timelistfromuser){
         timeDataManagement=new TimeDataManagement();
         List<String> finaltimelist = new ArrayList<>();
         if(!groupsList.isEmpty())
@@ -20,12 +20,14 @@ public class FirstTimeManagement {
             List<Map<String, List<String>>> finaltimetList = timeDataManagement.convertMapToList(timelistResult);
             timelistResult=timeDataManagement.removenulldatafromtimelist(finaltimetList);
             timelistResult=timeDataManagement.sortByKey(timelistResult);
-            finaltimelist   = timeDataManagement.Dateconverttolist(timelistResult);
+            timelistResult=timeDataManagement.checkingmisspunch(timelistResult,timelistfromuser);
+
+
+           finaltimelist   = timeDataManagement.Dateconverttolist(timelistResult);
             finaltimelist   = timeDataManagement.replacedTime(finaltimelist);
-            finaltimelist   = timeDataManagement.checkdoublecolonondata(finaltimelist);
-            finaltimelist   = timeDataManagement.replacedbyTime60(finaltimelist);
-
-
+          finaltimelist   = timeDataManagement.checkdoublecolonondata(finaltimelist);
+           finaltimelist   = timeDataManagement.replacedbyTime60(finaltimelist);
+            Log.e("timelistResult",""+finaltimelist);
         }
         return finaltimelist;
     }

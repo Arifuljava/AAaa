@@ -53,7 +53,8 @@ public class AttendenceSDK {
             public void onSuccess(String getfromextractapi,List<String>xlist,List<String>ylist) {
                 getfromextractapi=textClassificationManager.replaced(getfromextractapi);
                 List<Map<String, List<String>>> groupsList = textClassificationManager.rowManagement(getfromextractapi);
-                List<String> listfromx=checkinTwoRationmanagement.checkingxandy(groupsList,xlist);
+                List<String> listfromx=checkinTwoRationmanagement.checkingxandy(groupsList,ylist);
+               /*
                 List<String> listfromy=checkinTwoRationmanagement.checkingxandy(groupsList,ylist);
                 if(listfromx.size()>listfromy.size())
                 {
@@ -62,6 +63,7 @@ public class AttendenceSDK {
                 else{
 
                 }
+                */
                    /*
                     groupsList=datamanagement.datamanagementfromrationxandy(groupsList,ylist);
                 if(groupsList.size()>0)

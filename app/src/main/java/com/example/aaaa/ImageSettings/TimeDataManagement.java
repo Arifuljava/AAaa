@@ -3,8 +3,11 @@ package com.example.aaaa.ImageSettings;
 import android.util.Log;
 import android.util.Pair;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -227,7 +230,8 @@ public class TimeDataManagement {
                 .replace("\"", "1")
                 .replace("(","1")
                 .replace(")","1")
-                .replace(",","0");
+                .replace(",","0")
+                .replace("'","1");
     }
     private static int countNumbers(String text) {
         Pattern pattern = Pattern.compile("[0-9]");
@@ -379,16 +383,23 @@ public class TimeDataManagement {
                 word=replaceddata(word);
             }
             else {
-                String firsttwo = word.substring(0,2);
-                if(word.length()<3)
+                if(word.contains("9999"))
                 {
-                    String second=firsttwo;
-                    word=firsttwo ;
+                    word=word ;
                 }
-                else {
-                    String second=word.substring(3,word.length());
-                    word=firsttwo+""+second;
+                else{
+                    String firsttwo = word.substring(0,2);
+                    if(word.length()<3)
+                    {
+                        String second=firsttwo;
+                        word=firsttwo ;
+                    }
+                    else {
+                        String second=word.substring(3,word.length());
+                        word=firsttwo+""+second;
+                    }
                 }
+
 
             }
 
@@ -568,5 +579,79 @@ public class TimeDataManagement {
     public static boolean containsSpecialCharacter(String str) {
         String regex = "[^a-zA-Z0-9 ]"; // Matches anything that's not a letter, digit, or space
         return str.matches(".*" + regex + ".*");
+    }
+    public static List<String> createdatamanagement(List<String> userdatagiven, List<String> datalist){
+
+        List<String> createrangelist =createrange(userdatagiven);
+        Log.e("createrangelist",""+createrangelist);
+        List<String> updatetimelist = new ArrayList<>();
+        for(int ll =0;ll<userdatagiven.size();ll++)
+        {
+            updatetimelist.add("9999");
+        }
+        for (int k=0;k<datalist.size();k++) {
+            String data = datalist.get(k);
+            data=replaceddata(data);
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            try {
+                Date dataTime = sdf.parse(data);
+                long checkingTime = dataTime.getTime();
+                Log.e("checkingTime : "+data,""+checkingTime);
+
+
+                for (int i = 0; i < createrangelist.size(); i++) {
+                    long rangeTime = Long.parseLong(createrangelist.get(i));
+
+                    if (checkingTime < rangeTime) {
+                        updatetimelist.set(i, data);
+                        Log.e("Data : " + (i + 1), "" + data);
+                        break;
+                    }
+
+                    // If checkingTime is larger than all range times, set it to the last entry
+                    if (i == createrangelist.size() - 1 && checkingTime >= rangeTime) {
+                        updatetimelist.set(i + 1, data);
+                        Log.e("Data : " + (i + 2), "" + data);
+                    }
+                }
+
+                Log.e("updatetimelist", "" + updatetimelist);
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+return updatetimelist;
+    }
+    public  static  List<String> createrange( List<String> userdatagiven){
+        List<String> createrangelist=new ArrayList<>();
+        for (int i = 0; i < userdatagiven.size()-1; i++) {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                Date time1 = sdf.parse(userdatagiven.get(i));
+                Date time2 = sdf.parse(userdatagiven.get(i + 1));
+                Log.e(""+userdatagiven.get(i),""+time1.getTime());
+                long midpointMillis =time1.getTime() + (time2.getTime() - time1.getTime()) / 2;
+                createrangelist.add(""+midpointMillis);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return createrangelist;
+
+    }
+    public static Map<String, List<String>> checkingmisspunch(Map<String, List<String>> inputMap,List<String> timelistfromuser)
+    {
+        Map<String, List<String>> datelistrroup = new HashMap<>();
+        if (inputMap != null) {
+            for (int i = 0; i < inputMap.size(); i++) {
+                List<String> valueList = inputMap.get("" + i);
+              List<String> vvvvv=createdatamanagement(timelistfromuser,valueList);
+                Log.e(""+i,""+vvvvv);
+                datelistrroup.put(""+i,vvvvv);
+
+            }
+        }
+        return datelistrroup;
     }
 }

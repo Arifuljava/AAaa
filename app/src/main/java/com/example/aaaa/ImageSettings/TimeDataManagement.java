@@ -233,7 +233,7 @@ public class TimeDataManagement {
                 .replace(",","0")
                 .replace("'","1");
     }
-    private static int countNumbers(String text) {
+    public static int countNumbers(String text) {
         Pattern pattern = Pattern.compile("[0-9]");
         Matcher matcher = pattern.matcher(text);
         int count = 0;
@@ -331,15 +331,27 @@ public class TimeDataManagement {
     public static  Map<String, List<String>>  removenulldatafromtimelist(List<Map<String, List<String>>> groupsList) {
         Map<String, List<String>> timelistgroup = new HashMap<>();
 
-        for (Map<String, List<String>> map : groupsList) {
-            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-                String key = entry.getKey();
-                List<String> values = entry.getValue();
-                List<String> trackinglist = trackinglist(values);
-                timelistgroup.put(key,trackinglist);
-                //  Log.e("HHJJ",""+trackinglist);
+        if (groupsList != null) {
+            for (int i = 0; i < groupsList.size(); i++) {
+                Map<String, List<String>> map = groupsList.get(i);
+
+                if (map != null) {
+                    // Using an index-based loop for iterating over the map entries
+                    List<String> mapKeys = new ArrayList<>(map.keySet());
+                    for (int j = 0; j < mapKeys.size(); j++) {
+                        String key = mapKeys.get(j);
+                        List<String> values = map.get(key);
+
+                        if (values != null) {
+                            List<String> trackinglist = trackinglist(values);
+                            timelistgroup.put(key, trackinglist);
+                            // Log.e("HHJJ", "" + trackinglist);
+                        }
+                    }
+                }
             }
         }
+
         return  timelistgroup;
 
     }
@@ -367,9 +379,13 @@ public class TimeDataManagement {
         List<String> keys = new ArrayList<>(map.keySet());
         Collections.sort(keys, (key1, key2) -> Integer.compare(Integer.parseInt(key1), Integer.parseInt(key2)));
         Map<String, List<String>> sortedMap = new LinkedHashMap<>();
-        for (String key : keys) {
+
+// Using a for loop with index-based access
+        for (int i = 0; i < keys.size(); i++) {
+            String key = keys.get(i);
             sortedMap.put(key, map.get(key));
         }
+
         return sortedMap;
     }
     public    List<String> replacedTime( List<String>  finaltimelist)
@@ -603,15 +619,27 @@ public class TimeDataManagement {
                     long rangeTime = Long.parseLong(createrangelist.get(i));
 
                     if (checkingTime < rangeTime) {
-                        updatetimelist.set(i, data);
+                        if(updatetimelist.get(i).equals("9999"))
+                        {
+                            updatetimelist.set(i, data);
+                        }
+                        else {
+                            updatetimelist.set(i+1, data);
+                        }
+
                         Log.e("Data : " + (i + 1), "" + data);
                         break;
                     }
 
                     // If checkingTime is larger than all range times, set it to the last entry
                     if (i == createrangelist.size() - 1 && checkingTime >= rangeTime) {
-                        updatetimelist.set(i + 1, data);
-                        Log.e("Data : " + (i + 2), "" + data);
+                        if (updatetimelist.get(i).equals("9999")) {
+                            updatetimelist.set(i, data); // Set the current index with the data
+                        }
+                        else{
+                            updatetimelist.set(i+1, data);
+                        }
+                        Log.e("Data : " + (i + 1), "" + data);
                     }
                 }
 
@@ -649,6 +677,7 @@ return updatetimelist;
               List<String> vvvvv=createdatamanagement(timelistfromuser,valueList);
                 Log.e(""+i,""+vvvvv);
                 datelistrroup.put(""+i,vvvvv);
+                //break;
 
             }
         }

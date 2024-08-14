@@ -1,6 +1,9 @@
 package com.example.aaaa.ImageSettings;
 
 import static com.example.aaaa.AttendenceSDK.count_index;
+import static com.example.aaaa.ImageSettings.TimeDataManagement.countDigitsAfterColon;
+import static com.example.aaaa.ImageSettings.TimeDataManagement.countNumbers;
+import static com.example.aaaa.ImageSettings.TimeDataManagement.replaceddata;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -180,21 +183,7 @@ public class ImageSettingsActivity extends AppCompatActivity {
         }
         return count;
     }
-    public static List<String> extractTimeParts(String input) {
-        List<String> result = new ArrayList<>();
-        int firstColon = input.indexOf(':');
-        int lastColon = input.lastIndexOf(':');
-        if (firstColon != -1 && lastColon != -1 && firstColon != lastColon) {
-            if (firstColon >= 2) {
-                result.add(input.substring(firstColon - 2, firstColon + 3));
-            }
-            if (lastColon + 3 <= input.length() && lastColon - 2 >= 0) {
-                result.add(input.substring(lastColon - 2, lastColon + 3));
-            }
-        }
 
-        return result;
-    }
 String data = "1612:29161258";
     public static List<String> extractwhencolon1(String data) {
         // Splitting the string into two parts using the colon as a delimiter
@@ -243,11 +232,269 @@ String data = "1612:29161258";
         }
         return false;
     }
+    private  String extractDtae(String targetword) {
+        String extractDate ="";
+        if (targetword.length()>=7)
+        {
+            if(targetword.length()==7)
+            {
+                if (targetword.matches("\\d{4}:\\d{2}")) {
+                    extractDate = targetword.substring(2);
+                }
+                else{
+                    extractDate = targetword.substring(2);
+                }
+            }
+            else if(targetword.length()>=7)
+            {
+                if (targetword.matches("\\d{4}:\\d{2}")) {
+                    extractDate = targetword.substring(3);
+                }
+                else{
+                    extractDate = targetword.substring(3);
+                }
+            }
+
+        }
+        else if (targetword.length()==6)
+        {
+            int count = countDigitsAfterColon(targetword);
+
+            if(count>1)
+            {
+                extractDate = targetword.substring(1);
+            }
+            else {
+                Log.e("KKIIIII"+targetword,""+count);
+                extractDate = targetword.substring(2);
+                extractDate=extractDate+"0";
+            }
+
+
+        }
+        else {
+            extractDate = targetword.substring(0);
+        }
+        extractDate=replaceddata(extractDate);
+        return extractDate;
+    }
+    public  List<String> formatTimes(List<String> originalList) {
+        List<String> formattedList = new ArrayList<>();
+
+        for (int i = 0; i < originalList.size(); i++) {
+            String item = originalList.get(i);
+            Log.e("item",""+item);
+            if(item.length()>2)
+            {  String word ="";
+                if(item.contains(":"))
+                {
+                    List<String> timeParts = extractTimeParts(item);
+                    for (String timePart : timeParts) {
+                        word = extractDtae(timePart);
+
+                        word=replaceddata(word);
+                        formattedList.add(word);
+                    }
+                    /*
+                    int  colns = countColons(item);
+                    Log.e("WWWWWW",""+colns);
+                    if(colns>1)
+                    {
+                        List<String> timeParts = extractTimeParts(item);
+                        for (String timePart : timeParts) {
+                            word = extractDtae(timePart);
+
+                            word=replaceddata(word);
+                            formattedList.add(word);
+                        }
+
+                    }
+                    else{
+                        word = extractDtae(item);
+                        word=replaceddata(word);
+                        formattedList.add(word);
+                    }
+                     */
+
+
+                }
+                else {
+
+                    int  numbers =countNumbers(item);
+                    if (numbers>=6)
+                    {
+                        if(numbers==6)
+                        {
+                            String seconditem = "";
+                            if(i>0)
+                            {
+                                seconditem = originalList.get(i-1);
+                            }
+                            else{
+                                seconditem="50";
+                            }
+
+
+                            word =splitIntoPairs(item,seconditem);
+                            word=replaceddata(word);
+                            formattedList.add(word);
+                        }
+                        else{
+                            String seconditem = "";
+                            if(i>0)
+                            {
+                                seconditem = originalList.get(i-1);
+                            }
+                            else{
+                                seconditem="50";
+                            }
+                            word =splitIntoPairs(item,seconditem);
+                            word=replaceddata(word);
+                            formattedList.add(word);
+
+                        }
+                    }
+                    else if (numbers==5)
+                    {
+                        String seconditem = "";
+                        if(i>0)
+                        {
+                            seconditem = originalList.get(i-1);
+                        }
+                        else{
+                            seconditem="50";
+                        }
+                        //word =splitIntoPairs(item,seconditem);
+                        String kk = item.substring(3,item.length());
+                        word=item.substring(1,3)+":"+kk;
+
+                        word=replaceddata(word);
+                        formattedList.add(word);
+                    }
+                    else if (numbers<5){
+                        word =item;
+                        formattedList.add(word);
+                    }
+
+                }
+
+            }
+
+        }
+        Log.e("formatTimes",""+formattedList);
+        return formattedList;
+    }
+    public  String splitIntoPairs(String input, String previousdata) {
+        String word = " ";
+        List<String> parts = new ArrayList<>();
+        List<String> previousdataparts = new ArrayList<>();
+
+        for (int j = 0; j < input.length(); j += 2) {
+            parts.add(input.substring(j, Math.min(j + 2, input.length())));
+        }
+
+        for (int j = 0; j < previousdata.length(); j += 2) {
+            previousdataparts.add(previousdata.substring(j, Math.min(j + 2, previousdata.length())));
+        }
+
+        String suffix = "";
+        String prefix = "00"; // Default value if not enough parts are available
+
+        if (parts.size() > 1) {
+            suffix = parts.size() > 1 ? parts.get(1) : "00"; // Safeguard for index 1
+        }
+        if (parts.size() > 2) {
+            prefix = parts.get(2); // Safeguard for index 2
+            if (previousdataparts.size() > 1) {
+                String previousmin = previousdataparts.get(1);
+                if (prefix.length() < 2) {
+                    previousmin=removeSpecialCharactersAndSpaces(previousmin);
+                    if (Integer.parseInt(previousmin) > 30) {
+                        prefix = "5" + prefix;
+                    } else {
+                        prefix = "0" + prefix;
+                    }
+                }
+            }
+        }
+
+        word = suffix + ":" + prefix;
+        return word;
+    }
+    public  String removeSpecialCharactersAndSpaces(String input) {
+        if (input == null || input.isEmpty()) {
+            return input;
+        }
+        return input.replaceAll("[^0-9]", "");
+    }
+    public static List<String> formatTimes11(List<String> targetList) {
+        List<String> formattedTimes = new ArrayList<>();
+
+        for (String data : targetList) {
+            StringBuilder timeBuilder = new StringBuilder();
+            String[] times = data.split("\\\\");
+
+            for (String time : times) {
+                // Extract the last 5 characters (for XX:XX format)
+                if (time.length() >= 5) {
+                    time = time.substring(time.length() - 5);
+                }
+
+                // Ensure time has a colon and is in the correct format
+                if (time.contains(":") && time.length() >= 5) {
+                    timeBuilder.append(time).append(" ");
+                }
+                else{
+                    timeBuilder.append(time).append(" ");
+                }
+            }
+
+            // Add the formatted times to the list
+            if (timeBuilder.length() > 0) {
+                formattedTimes.add(timeBuilder.toString().trim());
+            }
+        }
+
+        // Join all formatted times into a single string with spaces and return the list
+        String result = String.join(" ", formattedTimes).replaceAll(" +", " ").trim();
+        formattedTimes.clear();
+        formattedTimes.add(result);
+        return formattedTimes;
+    }
+    public  List<String> extractTimeParts(String input) {
+
+        List<String> result = new ArrayList<>();
+        String regex = "(\\d{1,2}):(\\d{1,2})";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+        while (matcher.find()) {
+            String leftPart = matcher.group(1);
+            String rightPart = matcher.group(2);
+            if (leftPart.length() == 1) {
+                leftPart = "0" + leftPart;
+            }
+            if (rightPart.length() == 1) {
+                rightPart = "0" + rightPart;
+            }
+
+            result.add(leftPart + ":" + rightPart);
+        }
+
+        return result;
+    }
     public void imagesettings(View view) {
-       // createdatamanagement();
+        List<String>targetList=new ArrayList<>();
+        targetList.add("10755");
+        targetList.add("112:06");
+        targetList.add("|1112:57");
+        targetList.add("|1117:02");
+        targetList.add("117:571120:07");
+        List<String> formattedTimes = new ArrayList<>();
 
+        List<String> formattedList = formatTimes(targetList);
+        Log.e("formattedList", formattedList.toString());
 
-        createdatamanagement();
+/*
 
         AttendenceSDK.SendBitmap(bitmap, ImageSettingsActivity.this, new AttendenceSDK.SuccessCallback() {
             @Override
@@ -262,6 +509,7 @@ String data = "1612:29161258";
             }
         });
 
+ */
 
 
     }

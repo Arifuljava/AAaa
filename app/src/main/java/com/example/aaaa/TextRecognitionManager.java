@@ -16,6 +16,25 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.util.Log;
+import androidx.annotation.NonNull;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.mlkit.vision.common.InputImage;
+import com.google.mlkit.vision.text.Text;
+import com.google.mlkit.vision.text.TextRecognition;
+import com.google.mlkit.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class TextRecognitionManager {
 
     private static final String TAG = "TextRecognitionManager";
@@ -47,14 +66,43 @@ public class TextRecognitionManager {
                                     String lineText = line.getText();
                                     if(lineText.length()>3)
                                     {
-                                        xlist.add(""+x);
-                                        ylist.add(""+y);
+
                                         if (seconddata==null || seconddata=="")
                                         {
-                                            seconddata=seconddata+""+lineText;
+                                            int numbers= countNumbers(lineText);
+                                            int alphabet = countAlphabets(lineText);
+                                            if(numbers>alphabet)
+                                            {
+                                                if(seconddata.equals("")){
+                                                    seconddata=seconddata+""+lineText;
+                                                    xlist.add(""+x);
+                                                    ylist.add(""+y);
+                                                }
+                                                else{
+                                                    seconddata=seconddata+"\n"+lineText;
+                                                    xlist.add(""+x);
+                                                    ylist.add(""+y);
+                                                }
+
+                                            }
+
                                         }
                                         else{
-                                            seconddata=seconddata+"\n"+lineText;
+                                            int numbers= countNumbers(lineText);
+                                            int alphabet = countAlphabets(lineText);
+                                            if(numbers>alphabet)
+                                            {
+                                                if(seconddata.equals("")){
+                                                    seconddata=seconddata+""+lineText;
+                                                    xlist.add(""+x);
+                                                    ylist.add(""+y);
+                                                }
+                                                else{
+                                                    seconddata=seconddata+"\n"+lineText;
+                                                    xlist.add(""+x);
+                                                    ylist.add(""+y);
+                                                }
+                                            }
                                         }
 
 
@@ -87,7 +135,7 @@ public class TextRecognitionManager {
                                 .replace("\"", ":")
                                 .replace("(","|")
                                 .replace(")","|")
-                                ;
+                        ;
                         callback.onSuccess(seconddata,xlist,ylist);
                     }
                 })
@@ -100,7 +148,18 @@ public class TextRecognitionManager {
                     }
                 });
     }
-
+    public int countAlphabets(String str) {
+        return (int) str.chars().filter(Character::isLetter).count();
+    }
+    private  int countNumbers(String text) {
+        Pattern pattern = Pattern.compile("[0-9]");
+        Matcher matcher = pattern.matcher(text);
+        int count = 0;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
     public interface TextRecognitionCallback {
         void onSuccess(String resultText, List<String>xlist,List<String>ylist);
         void onError(String errorMessage);

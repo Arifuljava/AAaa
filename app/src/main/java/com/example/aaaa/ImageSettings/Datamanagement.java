@@ -10,6 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public  class Datamanagement {
     //logic 8  management using x and y size
     public static    List<Map<String, List<String>>>  datamanagementfromrationxandy(List<Map<String, List<String>>> groupsList, List<String> xlist){
@@ -96,7 +106,7 @@ public  class Datamanagement {
 
             mergedList=mergeLists(mergedList,targetList);
         }
-        System.out.println("Key: " + mergedList);
+        System.out.println("mergedList: " + valueList.size()+""+groupsList.size());
         return mergedList;
     }
     public static Map<String, List<String>> crerateMapusingSize(List<Integer> integerList, int detector) {

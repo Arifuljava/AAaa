@@ -1,5 +1,6 @@
 package com.example.aaaa.ImageSettings;
 
+
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -523,7 +524,7 @@ public class DateManagement {
         List<String> datechecking = new ArrayList<>();
         int mainkey = 0;
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i <= 15; i++) {
             String key = String.valueOf(mainkey);
             List<String> dates = datelistResult.get(key);
             Log.e("replacedDate",""+dates);
@@ -539,8 +540,8 @@ public class DateManagement {
                 //Log.e("hhhhhh : "+element,""+dates);
                 if(dates.contains(""+element))
                 {
-                   Log.e(kk+"gggggg : "+mainkey,""+dates);
-                     datechecking = replacedwithcount(dates,kk,sizzzee);
+                    Log.e(kk+"gggggg : "+mainkey,""+dates);
+                    datechecking = replacedwithcount(dates,kk,sizzzee);
                     datelistrroup.put("" + i, new ArrayList<>(datechecking));
                     mainkey++;
                 }
@@ -549,7 +550,7 @@ public class DateManagement {
                 }
             }
 
-           kk++;
+            kk++;
         }
 
 
@@ -584,7 +585,7 @@ public class DateManagement {
         return datechecking;
     }
     public static List<String> makeMaxStringList(Map<String, List<String>> map) {
-         List<String> updatedMap = new ArrayList<>();
+        List<String> updatedMap = new ArrayList<>();
 
         for (Map.Entry<String, List<String>> entry : map.entrySet()) {
             List<String> originalList = entry.getValue();
@@ -594,7 +595,7 @@ public class DateManagement {
                 mostFrequentValue = findSecondMostFrequentValue(originalList);
             }
              */
-          updatedMap.add(mostFrequentValue);
+            updatedMap.add(mostFrequentValue);
             Log.e("MakeUPP"+entry.getKey(),""+updatedMap);
         }
 
@@ -621,3 +622,4 @@ public class DateManagement {
         return sortedEntries.isEmpty() ? null : sortedEntries.get(0).getKey();
     }
 }
+

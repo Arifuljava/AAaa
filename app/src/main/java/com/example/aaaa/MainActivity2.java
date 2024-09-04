@@ -303,11 +303,12 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private static final int REQUEST_ENABLE_BT = 1;
-
+    private static final int LOCATION_PERMISSION_REQUEST_CODE_FOR_ALL_DEVICE = 7214;
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void changee(View view) {
 
 
+  /*
         if (bluetoothAdapter == null) {
 
             return;
@@ -330,7 +331,41 @@ public class MainActivity2 extends AppCompatActivity {
            }
         }
 
+   */
+        checkLocationPermission();
+    }
 
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Request the fine location permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE_FOR_ALL_DEVICE);
+        } else {
+            // Permission already granted, proceed with location-related tasks
+
+        }
+
+        // Check for background location permission for Android 10 and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                        LOCATION_PERMISSION_REQUEST_CODE_FOR_ALL_DEVICE);
+            }
+        }
+
+        // Check for coarse location permission for Android 13 and above
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                        LOCATION_PERMISSION_REQUEST_CODE_FOR_ALL_DEVICE);
+            }
+        }
     }
 
     private void enableBluetooth(BluetoothAdapter bluetoothAdapter) {
@@ -357,6 +392,15 @@ public class MainActivity2 extends AppCompatActivity {
         else  if (requestCode == 33){
             Toast.makeText(this, "Bluetooth enabled", Toast.LENGTH_SHORT).show();
 
+        }
+        else if (requestCode == LOCATION_PERMISSION_REQUEST_CODE_FOR_ALL_DEVICE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted
+                Toast.makeText(this, "Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                // Permission denied
+                Toast.makeText(this, "Location permission denied", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

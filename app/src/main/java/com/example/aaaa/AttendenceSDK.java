@@ -32,7 +32,7 @@ import java.util.Set;
 
 public class AttendenceSDK {
     public interface SuccessCallback {
-        void onSuccess(List<String> processedTextList);
+        void onSuccess(List<String> processedTextList,List<String>xlist,List<String>ylist);
     }
 
     public interface FailureCallback {
@@ -83,10 +83,10 @@ public class AttendenceSDK {
                     {
                         List<String> processedTextList =new ArrayList<>();
                         processedTextList.add("Please take image again");
-                        successCallback.onSuccess(processedTextList);
+                        successCallback.onSuccess(processedTextList,processedTextList,processedTextList);
                     }
                     else{
-                        successCallback.onSuccess(listfromx);
+                        successCallback.onSuccess(listfromx,listfromx,listfromx);
                     }
                     Log.e("getfromextractapi",""+detector);
 
@@ -97,10 +97,10 @@ public class AttendenceSDK {
                     {
                         List<String> processedTextList =new ArrayList<>();
                         processedTextList.add("Please take image again");
-                        successCallback.onSuccess(processedTextList);
+                        successCallback.onSuccess(processedTextList,processedTextList,processedTextList);
                     }
                     else{
-                        successCallback.onSuccess(listfromy);
+                        successCallback.onSuccess(listfromy,listfromy,listfromy);
                     }
                     Log.e("getfromextractapi",""+detector);
 

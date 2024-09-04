@@ -50,7 +50,7 @@ public class ImageSettingsActivity extends AppCompatActivity {
         resulttext = findViewById(R.id.resulttext);
         realimage = findViewById(R.id.realimage);
         try {
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.imagemissing);
+            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.newtesting);
             /*
             bitmap=imageBitmapManager.make90degress(bitmap);
             bitmap=imageBitmapManager.toGrayscale(bitmap);
@@ -288,13 +288,43 @@ String data = "1612:29161258";
             {  String word ="";
                 if(item.contains(":"))
                 {
-                    List<String> timeParts = extractTimeParts(item);
-                    for (String timePart : timeParts) {
-                        word = extractDtae(timePart);
+                    int  colns = countColons(item);
+                    if(item.length()>10)
+                    {
+                        if(colns>1)
+                        {
+                            List<String> timeParts = extractTimeParts(item);
+                            for (String timePart : timeParts) {
+                                word = extractDtae(timePart);
 
-                        word=replaceddata(word);
-                        formattedList.add(word);
+                                word=replaceddata(word);
+                                formattedList.add(word);
+                            }
+                        }
+                        else{
+                            List<String> timeParts = extractTimeParts(item);
+                            for (String timePart : timeParts) {
+                                word = extractDtae(timePart);
+
+                                word=replaceddata(word);
+                                formattedList.add(word);
+                            }
+                            String substring = item.substring(item.length() - 4);
+                            word=replaceddata(word);
+                            formattedList.add(word);
+
+                        }
                     }
+                    else{
+                        List<String> timeParts = extractTimeParts(item);
+                        for (String timePart : timeParts) {
+                            word = extractDtae(timePart);
+
+                            word=replaceddata(word);
+                            formattedList.add(word);
+                        }
+                    }
+
                     /*
                     int  colns = countColons(item);
                     Log.e("WWWWWW",""+colns);
@@ -482,34 +512,66 @@ String data = "1612:29161258";
 
         return result;
     }
+    public static List<String> extractTimes(List<String> targetList) {
+        List<String> extractedTimes = new ArrayList<>();
+        SimpleDateFormat inputFormat = new SimpleDateFormat("HHmm");
+        SimpleDateFormat outputFormat = new SimpleDateFormat("HH:mm");
+
+        for (String data : targetList) {
+            // Remove any unwanted characters and extract possible time patterns
+            String cleanedData = data.replaceAll("[^0-9]", "");
+            int length = cleanedData.length();
+
+            // Process substrings of 4 digits, since HHmm format has 4 digits
+            for (int i = 0; i <= length - 4; i += 4) {
+                String possibleTime = cleanedData.substring(i, i + 4);
+
+                try {
+                    Date time = inputFormat.parse(possibleTime);
+                    String formattedTime = outputFormat.format(time);
+                    extractedTimes.add(formattedTime);
+                } catch (ParseException e) {
+                    // Skip if parsing fails
+                }
+            }
+        }
+
+        return extractedTimes;
+    }
+
+    public static List<String> matchWithExpectedTimes(List<String> extractedTimes) {
+        List<String> expectedTimes = new ArrayList<>(); //List.of("08:00", "12:00", "13:00", "17:00", "18:00", "20:00");
+        expectedTimes.add("08:00");
+        expectedTimes.add("12:00");
+        expectedTimes.add("13:00");
+        expectedTimes.add("17:00");
+        expectedTimes.add("18:00");
+        expectedTimes.add("20:00");
+        List<String> matchedTimes = new ArrayList<>();
+
+        for (String expected : expectedTimes) {
+            for (String extracted : extractedTimes) {
+                if (extracted.equals(expected)) {
+                    matchedTimes.add(expected);
+                }
+            }
+        }
+
+        return matchedTimes;
+    }
     public void imagesettings(View view) {
-        List<String>targetList=new ArrayList<>();
-        targetList.add("10755");
-        targetList.add("112:06");
-        targetList.add("|1112:57");
-        targetList.add("|1117:02");
-        targetList.add("117:571120:07");
-        List<String> formattedTimes = new ArrayList<>();
+        List<String> stringList=new ArrayList<>();
+        stringList.add("08.00");
+        stringList.add("12.00");
+        stringList.add("13.00");
+        stringList.add("17.00");
+        stringList.add("18.00");
+        stringList.add("20.00");
 
-        List<String> formattedList = formatTimes(targetList);
-        Log.e("formattedList", formattedList.toString());
 
-/*
+        //AttendenceSDK.SendBitmap(stringList,);
 
-        AttendenceSDK.SendBitmap(bitmap, ImageSettingsActivity.this, new AttendenceSDK.SuccessCallback() {
-            @Override
-            public void onSuccess(List<String> processedTextList) {
-                //Log.e("GetData",""+processedTextList);
-            }
-        }, new AttendenceSDK.FailureCallback() {
-            @Override
-            public void onFailure(String e) {
-                Log.e("Failed","failed");
 
-            }
-        });
-
- */
 
 
     }
